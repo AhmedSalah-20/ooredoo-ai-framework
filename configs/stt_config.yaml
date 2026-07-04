@@ -1,0 +1,5 @@
+dataset:
+  name: "linagora/linto-dataset-audio-ar-tn"
+  split: "train"
+  streaming: true  # <--- Hedhi l'astuce lkbira !
+  sampling_rate: 16000

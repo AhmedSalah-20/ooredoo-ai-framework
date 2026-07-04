@@ -1,0 +1,28 @@
+# configs/models/llm_config.yaml
+# ← TON FILE EXISTANT!
+
+model:
+  model_id: "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
+  max_length: 512
+
+data:
+  dataset_path: "src/data/unified_tunisian_dataset.jsonl"
+  train_path: "src/data/train_data"
+  test_path: "src/data/test_data"
+  test_size: 0.1
+
+lora:
+  r: 8
+  alpha: 16
+  dropout: 0.05
+  target_modules: ["q_proj", "v_proj"]
+
+training:
+  output_dir: "./models/tunisian-lm-final"
+  learning_rate: "5e-4"
+  batch_size: 4
+  gradient_accumulation_steps: 2
+  epochs: 3
+  save_steps: 500
+  logging_steps: 100
+  fp16: false
