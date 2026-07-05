@@ -1,5 +1,9 @@
 dataset:
   name: "linagora/linto-dataset-audio-ar-tn"
-  split: "train"
-  streaming: true  # <--- Hedhi l'astuce lkbira !
+  streaming: true 
   sampling_rate: 16000
+  val_size: 500
+  model:
+  model_id: "openai/whisper-small"
+  language: "Arabic"
+  task: "transcribe"
