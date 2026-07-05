@@ -1,9 +1,35 @@
+# configs/models/stt_config.yaml
+#
+# Framework STT — Whisper + LoRA/QLoRA configurable.
+# Change ce fichier pour changer de dataset/modèle/quantization, jamais le code Python.
+
 dataset:
-  name: "linagora/linto-dataset-audio-ar-tn"
-  streaming: true 
+  huggingface: "linagora/linto-dataset-audio-ar-tn"   # dataset audio darija tunisienne (vérifié réel sur HF)
+  local_path: null            # si un jour tu ajoutes tes propres audios (src/data/audio/train, src/data/audio/test)
+  streaming: true              # dataset volumineux (podcasts/documentaires) -> évite de tout télécharger
   sampling_rate: 16000
-  val_size: 500
-  model:
+  val_size: 500                # nb d'exemples pris sur le train pour la validation
+
+model:
   model_id: "openai/whisper-small"
   language: "Arabic"
   task: "transcribe"
+
+peft:
+  use_lora: true
+  quantization: "4bit"          # none | 8bit | 4bit  <- 4bit = vraie QLoRA (NF4 + double quant)
+  r: 8
+  alpha: 32
+  dropout: 0.05
+  target_modules: ["q_proj", "v_proj"]
+
+training:
+  output_dir: "./models/whisper-tounsi"
+  batch_size: 16
+  grad_accum_steps: 2
+  learning_rate: 1e-5
+  warmup_steps: 500
+  max_steps: 4000
+  save_steps: 500
+  eval_steps: 500
+  logging_steps: 25
