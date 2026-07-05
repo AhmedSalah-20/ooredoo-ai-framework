@@ -130,7 +130,7 @@ class STTTrainer(BaseTrainer):
             eval_dataset=eval_dataset,
             data_collator=DataCollatorSpeechSeq2SeqWithPadding(processor=self.processor),
             compute_metrics=self.compute_metrics,
-            tokenizer=self.processor.feature_extractor,
+           
         )
 
         print("🚀 Lancement entraînement STT...")
