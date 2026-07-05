@@ -6,7 +6,7 @@
 dataset:
   huggingface: "linagora/linto-dataset-audio-ar-tn"   # dataset audio darija tunisienne (vérifié réel sur HF)
   local_path: null            # si un jour tu ajoutes tes propres audios (src/data/audio/train, src/data/audio/test)
-  streaming: true              # dataset volumineux (podcasts/documentaires) -> évite de tout télécharger
+  streaming: false             # dataset volumineux (podcasts/documentaires) -> évite de tout télécharger
   sampling_rate: 16000
   val_size: 500                # nb d'exemples pris sur le train pour la validation
 
