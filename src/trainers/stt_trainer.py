@@ -111,7 +111,7 @@ class STTTrainer(BaseTrainer):
             max_steps=cfg['max_steps'],
             gradient_checkpointing=True,
             fp16=True,
-            evaluation_strategy="steps",  # anciennes versions de transformers: "evaluation_strategy"
+            eval_strategy="steps",  # anciennes versions de transformers: "evaluation_strategy"
             predict_with_generate=True,
             generation_max_length=225,
             save_steps=cfg.get('save_steps', 500),
