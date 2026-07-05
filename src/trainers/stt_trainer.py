@@ -71,8 +71,8 @@ class STTTrainer(BaseTrainer):
             self.model.to(self.device)
 
         # Whisper: évite les hallucinations de tokens de langue/tâche forcés
-        self.model.config.forced_decoder_ids = None
-        self.model.config.suppress_tokens = []
+        self.model.generation_config.forced_decoder_ids = None
+        self.model.generation_config.suppress_tokens = []
 
         if peft_cfg.get('use_lora', True):
             if quant_config is not None:
@@ -111,7 +111,7 @@ class STTTrainer(BaseTrainer):
             max_steps=cfg['max_steps'],
             gradient_checkpointing=True,
             fp16=True,
-            eval_strategy="steps",  # anciennes versions de transformers: "evaluation_strategy"
+            evaluation_strategy="steps"  # anciennes versions de transformers: "evaluation_strategy"
             predict_with_generate=True,
             generation_max_length=225,
             save_steps=cfg.get('save_steps', 500),
