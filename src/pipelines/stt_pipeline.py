@@ -74,7 +74,11 @@ class STTPipeline(BasePipeline):
             features = self.processor.feature_extractor(
                 ex['audio']['array'], sampling_rate=ex['audio']['sampling_rate']
             ).input_features[0]
-            labels = self.processor.tokenizer(ex['transcript']).input_ids
+            labels = self.processor.tokenizer(
+                ex['transcript'],
+                truncation=True,
+                max_length=448
+            ).input_ids
             return {"input_features": features, "labels": labels}
 
         return dataset.map(preprocess)
