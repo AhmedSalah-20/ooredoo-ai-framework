@@ -1,56 +1,45 @@
-# src/pipelines/stt_pipeline.py
+import yaml
+from transformers import WhisperProcessor
+from src.data.stt_loader import STTDataLoader
 
-from src.base.base_pipeline import BasePipeline
-from datasets import load_dataset
-from transformers import AutoProcessor
-import librosa
+class STTPipeline:
+    def __init__(self, config_path: str):
+        self.config_path = config_path
+        with open(config_path, "r") as file:
+            self.config_model = yaml.safe_load(file)['model']
 
-class STPipeline(BasePipeline):
-    """Pipeline للـ STT"""
-    
-    def __init__(self, config):
-        super().__init__(config)
-        self.processor = AutoProcessor.from_pretrained(
-            config.get('model_id', 'facebook/wav2vec2-large-xlsr-53-arabic')
+        print("🧠 [Pipeline] Initialisation mté3 WhisperProcessor...")
+        self.processor = WhisperProcessor.from_pretrained(
+            self.config_model['model_id'],
+            language=self.config_model['language'],
+            task=self.config_model['task']
         )
-    
-    def load(self, data_path):
-        """Load audio data"""
-        dataset = load_dataset("audiofold", data_dir=data_path)
-        print(f"✅ STT Bronze: {len(dataset)} files")
-        return dataset
-    
-    def split(self, dataset):
-        """Split train/test"""
-        return dataset.train_test_split(test_size=0.1)
-    
-    def silver(self, dataset):
-        """Validate audio"""
-        def validate(ex):
-            try:
-                audio, sr = librosa.load(ex['file'], sr=16000)
-                duration = len(audio) / 16000
-                if duration < 1 or duration > 15:
-                    return False
-                return True
-            except:
-                return False
+
+    def prepare_dataset(self, batch):
+        audio = batch["audio"]
+        batch["input_features"] = self.processor.feature_extractor(
+            audio["array"], sampling_rate=audio["sampling_rate"]
+        ).input_features[0]
+        batch["labels"] = self.processor.tokenizer(batch["transcript"]).input_ids
+        return batch
+
+    def run(self):
+        """L'exécution complète mté3 l'pipeline"""
+        # 1. Njibou l'Loader
+        loader = STTDataLoader(self.config_path)
+        splits = loader.load_and_split()
+
+        processed_splits = {}
+        print("🚀 [Pipeline] Lancement mté3 l'extraction des features...")
         
-        return dataset.filter(validate)
-    
-    def gold(self, dataset):
-        """Tokenize audio"""
-        def preprocess(ex):
-            audio, sr = librosa.load(ex['file'], sr=16000)
-            processed = self.processor(
-                audio=audio,
-                text=ex.get('text', ''),
-                sampling_rate=16000
-            )
-            return {
-                "input_values": processed["input_values"][0],
-                "attention_mask": processed["attention_mask"][0],
-                "labels": processed.get("input_ids", [])
-            }
-        
-        return dataset.map(preprocess)
+        for split_name, dataset in splits.items():
+            print(f"   -> Traitement mté3 {split_name}...")
+            # 2. Preprocessing pur (Audio & Text)
+            ds = loader.preprocess(dataset)
+            # 3. Traitement mté3 l'modèle (Features & Labels)
+            ds = ds.map(self.prepare_dataset)
+            
+            processed_splits[split_name] = ds
+            
+        print("✅ [Pipeline] Data 7adhra 100% lel Fine-Tuning!")
+        return processed_splits
