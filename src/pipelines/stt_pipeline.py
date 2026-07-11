@@ -120,22 +120,9 @@ class STTPipeline(BasePipeline):
 
 
     def gold(self, dataset):
-<<<<<<< HEAD
-        """Extraction des features Whisper (log-mel) + tokenisation du texte."""
-        def preprocess(ex):
-            features = self.processor.feature_extractor(
-                ex['audio']['array'], sampling_rate=ex['audio']['sampling_rate']
-            ).input_features[0]
-            labels = self.processor.tokenizer(
-                ex['transcript'],
-                truncation=True,
-                max_length=448
-            ).input_ids
-            return {"input_features": features, "labels": labels}
 
-        return dataset.map(preprocess)
-=======
+
         print("🏆 Gold layer - feature extraction (simple)...")
         # Simple version - skip heavy processing for now
         return dataset  # TODO: add processor later when stable
->>>>>>> 815dabf (sttpipeline&llmpipeline)
+

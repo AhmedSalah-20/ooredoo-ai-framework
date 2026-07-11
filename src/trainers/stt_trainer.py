@@ -48,11 +48,6 @@ class STTTrainer:
 
         self.model = WhisperForConditionalGeneration.from_pretrained(
 
-<<<<<<< HEAD
-        # Whisper: évite les hallucinations de tokens de langue/tâche forcés
-        self.model.generation_config.forced_decoder_ids = None
-        self.model.generation_config.suppress_tokens = []
-=======
             model_cfg["model_id"],
 
             load_in_4bit=config["peft"].get(
@@ -60,7 +55,7 @@ class STTTrainer:
                 "use_4bit",
 
                 False
->>>>>>> 815dabf (sttpipeline&llmpipeline)
+
 
             )
 
@@ -356,12 +351,7 @@ class STTTrainer:
 
 
             eval_dataset=eval_dataset,
-<<<<<<< HEAD
-            data_collator=DataCollatorSpeechSeq2SeqWithPadding(processor=self.processor),
-            compute_metrics=self.compute_metrics,
-            
-           
-=======
+
 
 
             data_collator=data_collator,
@@ -370,7 +360,7 @@ class STTTrainer:
             compute_metrics=self.compute_metrics
 
 
->>>>>>> 815dabf (sttpipeline&llmpipeline)
+
         )
 
 
@@ -378,15 +368,7 @@ class STTTrainer:
         trainer.train()
 
 
-<<<<<<< HEAD
-    def inference(self, audio_path):
-        import librosa
-        audio, sr = librosa.load(audio_path, sr=16000)
-        inputs = self.processor.feature_extractor(audio, sampling_rate=16000, return_tensors="pt").input_features
-        with torch.no_grad():
-            predicted_ids = self.model.generate(inputs.to(self.model.device))
-        return self.processor.batch_decode(predicted_ids, skip_special_tokens=True)[0]
-=======
+
 
         return trainer
->>>>>>> 815dabf (sttpipeline&llmpipeline)
+
