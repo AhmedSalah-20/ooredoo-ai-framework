@@ -1,35 +1,126 @@
-# configs/models/stt_config.yaml
-#
-# Framework STT — Whisper + LoRA/QLoRA configurable.
-# Change ce fichier pour changer de dataset/modèle/quantization, jamais le code Python.
 
 dataset:
+<<<<<<< HEAD
   huggingface: "linagora/linto-dataset-audio-ar-tn"   # dataset audio darija tunisienne (vérifié réel sur HF)
   local_path: null            # si un jour tu ajoutes tes propres audios (src/data/audio/train, src/data/audio/test)
   streaming: false             # dataset volumineux (podcasts/documentaires) -> évite de tout télécharger
   sampling_rate: 16000
   val_size: 500                # nb d'exemples pris sur le train pour la validation
+=======
+  huggingface: "linagora/linto-dataset-audio-ar-tn"  
+  # Dataset splits
+  train_split: "train"
+  test_split: "test"
+   # Columns names
+  audio_column: "audio"
+  text_column: "transcript"
+  # Duration filtering
+  min_duration: 1.0
+  max_duration: 20.0
+# Text cleaning
+  lowercase: true
+  remove_punctuation: true
+  clean_regex: '[,\?\.\!\-\;\:\"\%“”]'
+  # Validation split
+  val_size: 300
+  streaming: False   
+  sampling_rate: 16000        
+>>>>>>> 815dabf (sttpipeline&llmpipeline)
 
 model:
   model_id: "openai/whisper-small"
-  language: "Arabic"
+  language: "ar"
   task: "transcribe"
+  max_label_length: 448
+
+# =========================
+# LoRA / QLoRA CONFIG
+# =========================
 
 peft:
+
   use_lora: true
-  quantization: "4bit"          # none | 8bit | 4bit  <- 4bit = vraie QLoRA (NF4 + double quant)
-  r: 8
-  alpha: 32
-  dropout: 0.05
-  target_modules: ["q_proj", "v_proj"]
+
+  lora_r: 8
+
+  lora_alpha: 16
+
+  lora_dropout: 0.05
+
+
+  target_modules:
+
+    - q_proj
+    - v_proj
+
+
+
+  use_4bit: true
+
+
+
+# =========================
+# TRAINING CONFIG
+# =========================
+
 
 training:
-  output_dir: "./models/whisper-tounsi"
-  batch_size: 16
-  grad_accum_steps: 2
-  learning_rate: 1e-5
-  warmup_steps: 500
-  max_steps: 4000
-  save_steps: 500
+
+
+  output_dir: "./outputs/whisper-ar"
+
+
+  num_train_epochs: 3
+
+
+  per_device_train_batch_size: 2
+
+
+  per_device_eval_batch_size: 2
+
+
+  gradient_accumulation_steps: 8
+
+
+
+  learning_rate: 0.00001
+
+
+  warmup_steps: 100
+
+
+
+  fp16: true
+
+
+
+  evaluation_strategy: "steps"
+
+
   eval_steps: 500
+<<<<<<< HEAD
   logging_steps: 25
+=======
+
+
+  save_steps: 500
+
+
+  logging_steps: 50
+
+
+
+  save_total_limit: 2
+
+
+
+  load_best_model_at_end: true
+
+
+
+  metric_for_best_model: "wer"
+
+
+
+  greater_is_better: false
+>>>>>>> 815dabf (sttpipeline&llmpipeline)

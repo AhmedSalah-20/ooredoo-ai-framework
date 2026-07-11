@@ -1,10 +1,9 @@
 # src/unified_pipeline.py - FIXED
 
 import yaml
-from src.pipelines.llm_pipeline import LLMDataPipeline
+from src.pipelines.llm_pipeline import LLMPipeline
 from src.trainers.llm_trainer import LLMTrainer
 from datasets import load_from_disk
-
 class UnifiedPipeline:
     """
     ORCHESTRATOR: Connecte STT → LLM → TTS
@@ -27,7 +26,7 @@ class UnifiedPipeline:
         print("📝 LLM DATA PIPELINE")
         print("="*70)
         
-        llm_pipeline = LLMDataPipeline(self.llm_config)
+        llm_pipeline = LLMPipeline(self.llm_config)
         
         # Load
         raw = llm_pipeline.load(self.llm_config['data']['dataset_path'])

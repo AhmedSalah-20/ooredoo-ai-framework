@@ -32,6 +32,16 @@ function switchTab(tabId) {
     // Changer le titre en haut
     document.getElementById('page-title').innerHTML = pageTitles[tabId];
 }
+function updatePlaceholder() {
+    const source = document.getElementById('dataset-source').value;
+    const input = document.getElementById('dataset-path');
+    
+    if (source === 'huggingface') input.placeholder = "ex: linagora/linto-dataset-audio-ar-tn";
+    else if (source === 'jsonl') input.placeholder = "ex: data/train.jsonl";
+    else if (source === 'csv') input.placeholder = "ex: data/train.csv";
+    else if (source === 'parquet') input.placeholder = "ex: data/dataset.parquet";
+    else if (source === 'audio_folder') input.placeholder = "ex: data/audio_wavs/";
+}
 
 // ==========================================
 // 2. SIMULATION DE L'ENTRAÎNEMENT (COURBES CHART.JS)
@@ -160,3 +170,104 @@ window.onload = () => {
         tag.addEventListener('click', () => tag.classList.toggle('active'));
     });
 };
+
+
+// ============== DATA PIPELINE FUNCTION ==============
+async function runPipeline(event) {
+    event.preventDefault();
+    
+    // 1. Nejbdou les valeurs mel interface
+    const pipelineType = document.getElementById('pipeline-type').value;
+    const datasetSource = document.getElementById('dataset-source').value;
+    const datasetPath = document.getElementById('dataset-path').value;
+    const statusText = document.getElementById('pipeline-status-text');
+    
+    if (!datasetPath) {
+        alert("Please enter a dataset path!");
+        return;
+    }
+
+    statusText.innerHTML = "⏳ Processing... Please wait.";
+    
+    // 2. ✨ L'ASTUCE HOUNI: Nbadlou l'URL mtaa l'API 3la 7aseb l'Pipeline
+    let apiUrl = "http://127.0.0.1:8000/api/pipeline/stt/process"; // Par defaut STT
+    if (pipelineType === "llm") {
+        apiUrl = "http://127.0.0.1:8000/api/pipeline/llm/process"; // Ken khtar LLM
+    }
+
+    try {
+        // 3. Nab3thou l'requête lel Backend
+        const response = await fetch(apiUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+                source: datasetSource,
+                dataset_path: datasetPath 
+            })
+        });
+
+        const data = await response.json();
+        
+        if (data.status === "success") {
+            // Mise à jour mtaa l'Stats
+            document.getElementById('stat-train-raw').innerText = data.dataset.train_raw;
+            document.getElementById('stat-test-raw').innerText = data.dataset.test_raw;
+            document.getElementById('stat-train-silver').innerText = data.dataset.train_silver;
+            document.getElementById('stat-val-silver').innerText = data.dataset.val_silver;
+            document.getElementById('stat-train-gold').innerText = data.dataset.train_gold;
+            document.getElementById('stat-val-gold').innerText = data.dataset.val_gold;
+            
+            statusText.innerHTML = "✅ Pipeline executed successfully!";
+            statusText.style.color = "#16a34a";
+
+            // 4. Affichage mtaa les exemples (Samples)
+            const samplesSection = document.getElementById('samples-section');
+            const samplesContainer = document.getElementById('samples-container');
+            
+            if (data.samples && data.samples.length > 0) {
+                samplesContainer.innerHTML = ''; 
+                samplesSection.style.display = 'block'; 
+
+                data.samples.forEach((sample, index) => {
+                    if (pipelineType === 'stt') {
+                        // Affichage Audio (STT)
+                        samplesContainer.innerHTML += `
+                            <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e1; display: flex; align-items: center; gap: 20px;">
+                                <div style="min-width: 35px; font-weight: bold; color: #94a3b8; font-size: 18px;">#${index + 1}</div>
+                                <audio controls src="${sample.audio}" style="height: 40px; width: 260px; outline: none;"></audio>
+                                <div style="flex-grow: 1; font-size: 15px; color: #334155; padding-left: 15px; border-left: 2px solid #e2e8f0;">
+                                    <strong style="color: #64748b; font-size: 12px; text-transform: uppercase;">Transcript:</strong><br>
+                                    <span style="font-weight: 600;" dir="rtl">${sample.text}</span>
+                                </div>
+                            </div>
+                        `;
+                    } else if (pipelineType === 'llm') {
+                        // Affichage Text (LLM)
+                        samplesContainer.innerHTML += `
+                            <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e1; display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px;">
+                                <div style="font-weight: bold; color: #94a3b8; font-size: 16px;">Sample #${index + 1}</div>
+                                <div style="font-size: 14px; color: #334155; background: #e2e8f0; padding: 10px; border-radius: 6px;">
+                                    <strong style="color: #1e293b;">👤 User (Prompt):</strong><br>
+                                    <span dir="auto">${sample.prompt}</span>
+                                </div>
+                                <div style="font-size: 14px; color: #15803d; background: #dcfce7; padding: 10px; border-radius: 6px;">
+                                    <strong style="color: #166534;">🤖 Assistant (Response):</strong><br>
+                                    <span dir="auto">${sample.response}</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+            }
+
+        } else {
+            alert("Error: " + data.message);
+            statusText.innerHTML = "❌ Pipeline failed.";
+            statusText.style.color = "#dc2626";
+        }
+    } catch (error) {
+        alert("Connection error: " + error.message);
+        statusText.innerHTML = "❌ Connection failed.";
+        statusText.style.color = "#dc2626";
+    }
+}

@@ -1,28 +1,72 @@
-# configs/models/llm_config.yaml
-# ← TON FILE EXISTANT!
+dataset:
+  # L'API (app.py) tawa tnajem ta9ra l'path mtaa l'dataset directement mel frontend
+  # L'huggingface houni tnajem tkhalliha kima default fallback ken ma b3athnech path
+  huggingface: "linagora/linto-dataset-text-ar-tn"
+  
+  train_split: "train"
+  test_split: "test"
+  
+  # L'pipeline jdid fih "val_size" yefhemha bel b'nombre d'exemples (ex: 300) 
+  # wela b'pourcentage (ex: 0.1). 300 dima ashel w akther stabilité.
+  val_size: 300
+  
+  # ⚠️ REMARQUE: Fasa5na text_column w input/output columns.
+  # L'pipeline tawa "Intelligent", detecti wa7dou les formats (ShareGPT, Alpaca, QA...)
+  # w ykharej colonne final esmha "text_formatted" lel modele.
+  
+  # Formatting parameters (Yemchi lel training)
+  format_style: "chatml"           # ChatML dima the best lel LLMs jdod
+  max_seq_length: 2048
+  remove_extra_spaces: true
+  lowercase: false
 
 model:
-  model_id: "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
-  max_length: 512
+  model_id: "Qwen/Qwen2-7B-Instruct"     # Excellent choix (Rapide w fih context kbir)
+  # model_id: "meta-llama/Meta-Llama-3-8B-Instruct" # Alternative
+  
+  task: "causal-lm"
+  trust_remote_code: true
+  use_flash_attention_2: true      # Rodha true ken l'GPU ysupporti (kima A100/H100/RTX3090)
 
-data:
-  dataset_path: "src/data/unified_tunisian_dataset.jsonl"
-  train_path: "src/data/train_data"
-  test_path: "src/data/test_data"
-  test_size: 0.1
-
-lora:
-  r: 8
-  alpha: 16
-  dropout: 0.05
-  target_modules: ["q_proj", "v_proj"]
+peft:
+  # QLoRA Configuration (Idéal lel memoire)
+  use_lora: true
+  lora_r: 16
+  lora_alpha: 32
+  lora_dropout: 0.05
+  
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+  
+  use_4bit: true                   # 4-bit quantization bech yetrena 3la GPU sghir
 
 training:
-  output_dir: "./models/tunisian-lm-final"
-  learning_rate: "5e-4"
-  batch_size: 4
-  gradient_accumulation_steps: 2
-  epochs: 3
-  save_steps: 500
-  logging_steps: 100
-  fp16: false
+  output_dir: "./outputs/llm_tunisian"
+  
+  num_train_epochs: 3
+  per_device_train_batch_size: 2
+  per_device_eval_batch_size: 2
+  gradient_accumulation_steps: 8
+  
+  learning_rate: 0.0002            # 2e-4
+  warmup_ratio: 0.1
+  lr_scheduler_type: "cosine"
+  
+  fp16: true
+  bf16: false                      # Rodha true ken GPU Ampere wela fou9 (A100/RTX3000+)
+  
+  evaluation_strategy: "steps"
+  eval_steps: 200
+  save_steps: 200
+  logging_steps: 50
+  
+  save_total_limit: 3
+  load_best_model_at_end: true
+  metric_for_best_model: "eval_loss"
+  greater_is_better: false
