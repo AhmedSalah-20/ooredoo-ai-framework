@@ -12,12 +12,12 @@ from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-# ✅ Path setup bech l'imports mtaa src yekhdmou mriglin
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.pipelines.llm_pipeline import LLMPipeline
 from src.pipelines.stt_pipeline import STTPipeline
-# from src.trainers.llm_trainer import LLMTrainer  # Nrajj3ouha waqtlli twalli 7adhra
+from src.pipelines.tts_pipeline import TTSPipeline
 
 # ============= LOGGING =============
 logging.basicConfig(level=logging.INFO)
@@ -53,6 +53,7 @@ def load_config(path: str) -> dict:
 
 llm_config = load_config("configs/llm_config.yaml")
 stt_config = load_config("configs/stt_config.yaml")
+tts_config = load_config("configs/tts_config.yaml")
 
 # ============= MODELS =============
 class PipelineRequest(BaseModel):
@@ -208,7 +209,81 @@ def process_stt_pipeline(request: PipelineRequest):
         logger.error(f"❌ STT Pipeline error: {e}")
         return {"status": "error", "message": str(e)}
 
+# ==========================================
+#              TTS PIPELINE
+# ==========================================
+@app.post("/api/pipeline/tts/process")
+def process_tts_pipeline(request: PipelineRequest):
+    try:
+        logger.info(f"🚀 TTS Pipeline started for: {request.dataset_path}")
+        
+        current_config = tts_config.copy()
+        if "dataset" not in current_config:
+            current_config["dataset"] = {}
+            
+        current_config["dataset"]["source"] = request.source
+        current_config["dataset"]["path"] = request.dataset_path
 
+        # Run Pipeline
+        pipeline = TTSPipeline(config=current_config)
+        results = pipeline.run()
+        
+        # Extraction des amthla (Samples) lel Frontend
+        samples_data = []
+        silver_train = results["silver"]["train"]
+        sample_subset = silver_train.select(range(min(3, len(silver_train))))
+        
+        col_text = results["cols"]["text"]
+        col_audio = results["cols"]["audio"]
+
+        try:
+            logger.info("🎵 Extracting TTS audio/text samples for frontend...")
+            for item in sample_subset:
+                text_data = item[col_text]
+                audio_data = item[col_audio]
+
+                # 💥 Use the safe dynamic extractor here
+                arr, sr = pipeline.extract_audio_info(audio_data)
+
+                if arr is None or sr is None:
+                    logger.warning("⚠️ Skipping sample due to missing or undecodable audio array/rate")
+                    continue
+
+                buffer = io.BytesIO()
+                sf.write(
+                    buffer,
+                    arr,
+                    sr,
+                    format="WAV"
+                )
+                audio_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+
+                samples_data.append({
+                    "audio": f"data:audio/wav;base64,{audio_base64}",
+                    "text": text_data
+                })
+        except Exception as e:
+            logger.warning(f"⚠️ Could not extract TTS samples: {e}")
+
+        raw_test_len = len(results["raw"]["test"]) if results["raw"]["test"] is not None else 0
+        
+        return {
+            "status": "success",
+            "message": "TTS pipeline completed successfully",
+            "dataset": {
+                "train_raw": len(results["raw"]["train"]),
+                "test_raw": raw_test_len,
+                "train_silver": len(results["silver"]["train"]),
+                "val_silver": len(results["silver"]["val"]),
+                "train_gold": len(results["gold"]["train"]),
+                "val_gold": len(results["gold"]["val"])
+            },
+            "samples": samples_data
+        }
+    except Exception as e:
+        logger.error(f"❌ TTS Pipeline error: {e}")
+        return {"status": "error", "message": str(e)}
+    
 # ==========================================
 #          MOCK ENDPOINTS (STT / TTS)
 # ==========================================

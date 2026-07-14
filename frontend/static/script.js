@@ -32,6 +32,7 @@ function switchTab(tabId) {
     // Changer le titre en haut
     document.getElementById('page-title').innerHTML = pageTitles[tabId];
 }
+
 function updatePlaceholder() {
     const source = document.getElementById('dataset-source').value;
     const input = document.getElementById('dataset-path');
@@ -61,7 +62,7 @@ function initCharts() {
             labels: [0, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550],
             datasets: [{
                 label: 'Training Loss',
-                data: [3.5, 2.8, 2.4, 2.1, 1.8, 1.5, 1.4, 1.3, 1.25, 1.2, 1.15, 2.5], // Simule le pic final vu sur la capture
+                data: [3.5, 2.8, 2.4, 2.1, 1.8, 1.5, 1.4, 1.3, 1.25, 1.2, 1.15, 2.5],
                 borderColor: '#ED1C24',
                 borderWidth: 2,
                 pointRadius: 0,
@@ -171,8 +172,9 @@ window.onload = () => {
     });
 };
 
-
-// ============== DATA PIPELINE FUNCTION ==============
+// ==========================================
+// 3. RUN AUTOMATED PIPELINES (STT / LLM / TTS)
+// ==========================================
 async function runPipeline(event) {
     event.preventDefault();
     
@@ -188,15 +190,20 @@ async function runPipeline(event) {
     }
 
     statusText.innerHTML = "⏳ Processing... Please wait.";
+    statusText.style.color = "#3b82f6";
     
-    // 2. ✨ L'ASTUCE HOUNI: Nbadlou l'URL mtaa l'API 3la 7aseb l'Pipeline
-    let apiUrl = "http://127.0.0.1:8000/api/pipeline/stt/process"; // Par defaut STT
+    // 2. Nbadlou l'URL mtaa l'API selon l'Pipeline choisi
+    let apiUrl = "";
     if (pipelineType === "llm") {
-        apiUrl = "http://127.0.0.1:8000/api/pipeline/llm/process"; // Ken khtar LLM
+        apiUrl = "/api/pipeline/llm/process";
+    } else if (pipelineType === "stt") {
+        apiUrl = "/api/pipeline/stt/process";
+    } else if (pipelineType === "tts") { 
+        apiUrl = "/api/pipeline/tts/process";
     }
 
     try {
-        // 3. Nab3thou l'requête lel Backend
+        // 3. Nab3thou l'requête dynamique lel Backend
         const response = await fetch(apiUrl, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -209,7 +216,7 @@ async function runPipeline(event) {
         const data = await response.json();
         
         if (data.status === "success") {
-            // Mise à jour mtaa l'Stats
+            // Mise à jour des Statistiques dans les 3 couches
             document.getElementById('stat-train-raw').innerText = data.dataset.train_raw;
             document.getElementById('stat-test-raw').innerText = data.dataset.test_raw;
             document.getElementById('stat-train-silver').innerText = data.dataset.train_silver;
@@ -220,7 +227,7 @@ async function runPipeline(event) {
             statusText.innerHTML = "✅ Pipeline executed successfully!";
             statusText.style.color = "#16a34a";
 
-            // 4. Affichage mtaa les exemples (Samples)
+            // 4. Affichage dynamique mtaa les amthla (Samples)
             const samplesSection = document.getElementById('samples-section');
             const samplesContainer = document.getElementById('samples-container');
             
@@ -229,20 +236,23 @@ async function runPipeline(event) {
                 samplesSection.style.display = 'block'; 
 
                 data.samples.forEach((sample, index) => {
-                    if (pipelineType === 'stt') {
-                        // Affichage Audio (STT)
+                    // Ken el Pipeline fih Audio (STT wela TTS)
+                    if (pipelineType === 'stt' || pipelineType === 'tts') {
+                        const labelText = (pipelineType === 'stt') ? 'Transcript:' : 'Target Text:';
+                        
                         samplesContainer.innerHTML += `
-                            <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e1; display: flex; align-items: center; gap: 20px;">
+                            <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e1; display: flex; align-items: center; gap: 20px; margin-bottom: 10px;">
                                 <div style="min-width: 35px; font-weight: bold; color: #94a3b8; font-size: 18px;">#${index + 1}</div>
                                 <audio controls src="${sample.audio}" style="height: 40px; width: 260px; outline: none;"></audio>
                                 <div style="flex-grow: 1; font-size: 15px; color: #334155; padding-left: 15px; border-left: 2px solid #e2e8f0;">
-                                    <strong style="color: #64748b; font-size: 12px; text-transform: uppercase;">Transcript:</strong><br>
+                                    <strong style="color: #64748b; font-size: 12px; text-transform: uppercase;">${labelText}</strong><br>
                                     <span style="font-weight: 600;" dir="rtl">${sample.text}</span>
                                 </div>
                             </div>
                         `;
-                    } else if (pipelineType === 'llm') {
-                        // Affichage Text (LLM)
+                    } 
+                    // Ken el Pipeline fih text barka (LLM)
+                    else if (pipelineType === 'llm') {
                         samplesContainer.innerHTML += `
                             <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e1; display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px;">
                                 <div style="font-weight: bold; color: #94a3b8; font-size: 16px;">Sample #${index + 1}</div>

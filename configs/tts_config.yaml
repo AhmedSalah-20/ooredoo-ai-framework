@@ -1,0 +1,25 @@
+dataset:
+  # Fallback dataset ken ma t7at chay fel frontend (ex: common voice wala dataset ooredoo)
+  huggingface: "mozilla-foundation/common_voice_13_0" 
+  train_split: "train"
+  val_size: 300
+  
+  # L'Pipeline bch ydetectihom wa7dou, ama nkhaliwhom kima configuration par defaut
+  audio_column: "audio"
+  text_column: "sentence"
+  
+  # Formatting (mtaa l'audio)
+  target_sample_rate: 22050     # Standard lel TTS (VITS / FastSpeech)
+
+model:
+  model_id: "facebook/mms-tts-ara"  # Modele behi lel 3arbi
+  task: "text-to-speech"
+  use_flash_attention_2: false
+
+training:
+  output_dir: "./outputs/tts_tunisian"
+  num_train_epochs: 100
+  learning_rate: 0.0002
+  per_device_train_batch_size: 16
+  save_steps: 500
+  logging_steps: 100
