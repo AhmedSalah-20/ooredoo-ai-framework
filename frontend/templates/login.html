@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ooredoo AI Framework - Login</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ooredoo-red: #ED1C24;
+            --ooredoo-dark: #b8161c;
+            --bg-color: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-image: radial-gradient(circle at top right, #fde8e9 0%, #f8fafc 40%);
+        }
+
+        .login-container {
+            background: var(--white);
+            width: 100%;
+            max-width: 420px;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-section i {
+            font-size: 40px;
+            color: var(--ooredoo-red);
+            margin-bottom: 15px;
+        }
+
+        .logo-section h2 {
+            color: var(--text-main);
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .logo-section p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-main);
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 12px 12px 12px 40px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-wrapper input:focus {
+            border-color: var(--ooredoo-red);
+            box-shadow: 0 0 0 3px rgba(237, 28, 36, 0.1);
+        }
+
+        .error-message {
+            color: var(--ooredoo-red);
+            font-size: 13px;
+            margin-bottom: 15px;
+            display: none;
+            text-align: center;
+            background: #fef2f2;
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .login-btn {
+            width: 100%;
+            background: var(--ooredoo-red);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .login-btn:hover {
+            background: var(--ooredoo-dark);
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <div class="logo-section">
+            <i class="fas fa-network-wired"></i>
+            <h2>Ooredoo AI Framework</h2>
+            <p>Enterprise Management Console</p>
+        </div>
+
+        <div id="error-box" class="error-message">
+            <i class="fas fa-exclamation-circle"></i> Invalid credentials.
+        </div>
+
+        <form id="login-form">
+            <div class="input-group">
+                <label>Email Address</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" placeholder="name@ooredoo.tn" required>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Password</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" placeholder="••••••••" required>
+                </div>
+            </div>
+
+            <button type="submit" class="login-btn" id="submit-btn">
+                <span>Sign In</span>
+                <i class="fas fa-arrow-right"></i>
+            </button>
+        </form>
+
+        <div class="footer-text">
+            &copy; 2026 Ooredoo Data & AI Department. All rights reserved.
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('submit-btn');
+            const errorBox = document.getElementById('error-box');
+
+            // Animation simple du bouton
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
+            btn.style.opacity = '0.8';
+            errorBox.style.display = 'none';
+
+            // Simulation d'un appel API vers FastAPI (à remplacer par le vrai fetch plus tard)
+            setTimeout(() => {
+                // Mock Logic
+                if (email === "directeur@ooredoo.tn" && password === "admin123") {
+                    localStorage.setItem("userRole", "directeur");
+                    window.location.href = "/dashboard"; // أو '/' حسب الـ routing في FastAPI
+                } else if (email === "tech@ooredoo.tn" && password === "tech123") {
+                    localStorage.setItem("userRole", "encadrant");
+                    window.location.href = "/dashboard";
+                } else {
+                    errorBox.style.display = 'block';
+                    btn.innerHTML = '<span>Sign In</span> <i class="fas fa-arrow-right"></i>';
+                    btn.style.opacity = '1';
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

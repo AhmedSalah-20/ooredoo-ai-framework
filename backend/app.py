@@ -11,7 +11,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-
+from fastapi.templating import Jinja2Templates
+from fastapi import Request
+from fastapi.responses import RedirectResponse
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -39,6 +41,8 @@ app.add_middleware(
 )
 
 app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
+
+templates = Jinja2Templates(directory="frontend/templates")
 
 # ============= CONFIG LOADING =============
 # (Nesta3mlou dossier 'configs' kima tfehemna 9bila)
@@ -72,11 +76,23 @@ training_state = {
 # ==========================================
 #                  ROUTES
 # ==========================================
-
 @app.get("/")
 async def root():
-    """Serve main HTML page"""
-    return FileResponse("frontend/static/index.html")
+    """Redirect automatically from / to /login"""
+    # كي تحل http://localhost:8000 يهزك طول لصفحة الـ Login
+    return RedirectResponse(url="/login")
+
+@app.get("/login")
+async def login_page(request: Request):
+    """Serve the Login page"""
+    # يقرأ الفيشي login.html
+    return templates.TemplateResponse(request=request, name="login.html")
+
+@app.get("/dashboard")
+async def dashboard(request: Request):
+    """Serve the main Dashboard page"""
+    # يقرأ الفيشي index.html (الـ Dashboard متاعك)
+    return templates.TemplateResponse(request=request, name="index.html")
 
 @app.get("/api/health")
 async def health():
