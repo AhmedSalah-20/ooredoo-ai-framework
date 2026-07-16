@@ -7,7 +7,6 @@
     <!-- Import des polices et icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js lel les graphes mta3 l'entraînement -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="/static/style.css">
 </head>
@@ -18,34 +17,16 @@
             <div>
                 <div class="sidebar-header">
                     <img src="/static/logo-ooredoo.png" alt="Ooredoo" class="ooredoo-logo" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Ooredoo_logo.svg/512px-Ooredoo_logo.svg.png'">
-                 
                 </div>
                 
-                <div class="framework-badge">
-                    LLM Fine-Tuning Framework
-                </div>
-
                 <div class="sidebar-menu">
                     <p class="menu-label">WORKSPACE</p>
-                    <button class="menu-btn active" onclick="switchTab('overview')">
-                        <i class="fas fa-chart-pie"></i> Executive Overview
-                        <span class="active-dot"></span>
-                    </button>
-                    <button class="menu-btn" onclick="switchTab('pipeline')">
-                        <i class="fas fa-database"></i> Data Pipeline
-                    </button>
-                    <button class="menu-btn" onclick="switchTab('config')">
-                        <i class="fas fa-cog"></i> LoRA & Quantization
-                    </button>
-                    <button class="menu-btn" onclick="switchTab('training')">
-                        <i class="fas fa-rocket"></i> Active Training
-                    </button>
-                    <button class="menu-btn" onclick="switchTab('chatbot')">
-                        <i class="fas fa-comment-dots"></i> Voice Chatbot
-                    </button>
-                    <button class="menu-btn" onclick="switchTab('benchmarking')">
-                        <i class="fas fa-balance-scale"></i> Benchmarking
-                    </button>
+                    <button class="menu-btn active" onclick="switchTab('overview')"><i class="fas fa-chart-pie"></i> Executive Overview<span class="active-dot"></span></button>
+                    <button class="menu-btn" onclick="switchTab('pipeline')"><i class="fas fa-database"></i> Data Pipeline</button>
+                    <button class="menu-btn" onclick="switchTab('config')"><i class="fas fa-cog"></i> LoRA & Quantization</button>
+                    <button class="menu-btn" onclick="switchTab('training')"><i class="fas fa-rocket"></i> Active Training</button>
+                    <button class="menu-btn" onclick="switchTab('chatbot')"><i class="fas fa-comment-dots"></i> Voice Chatbot</button>
+                    <button class="menu-btn" onclick="switchTab('benchmarking')"><i class="fas fa-balance-scale"></i> Benchmarking</button>
                 </div>
             </div>
 
@@ -56,425 +37,35 @@
                     <h4>Ahmed Amine Salah</h4>
                     <p>ML Engineer · Ooredoo TN</p>
                 </div>
-            
             </div>
         </aside>
 
         <!-- MAIN CONTENT -->
         <main class="main-content">
-           <!-- TOP NAVBAR -->
-<header class="top-nav">
-    <h2 id="page-title"><i class="fas fa-chart-pie"></i> Executive Overview</h2>
-    
-    <div class="top-controls" style="display: flex; align-items: center; gap: 15px;">
-        <select class="model-selector">
-            <option>ooredoo-llm-v1</option>
-            <option>ooredoo-stt-whisper</option>
-            <option>ooredoo-tts-vits</option>
-        </select>
-        
-        <div class="avatar small">AS</div>
-        
-        <!-- فلسة الخروج الجديدة -->
-        <button onclick="logout()" class="logout-nav-btn" title="Déconnexion">
-            <i class="fas fa-sign-out-alt"></i> <span>Quitter</span>
-        </button>
-    </div>
-</header>
+            <!-- TOP NAVBAR -->
+            <header class="top-nav">
+                <h2 id="page-title"><i class="fas fa-chart-pie"></i> Executive Overview</h2>
+                <div class="top-controls" style="display: flex; align-items: center; gap: 15px;">
+                    <select class="model-selector">
+                        <option>ooredoo-llm-v1</option>
+                        <option>ooredoo-stt-whisper</option>
+                        <option>ooredoo-tts-vits</option>
+                    </select>
+                    <div class="avatar small">AS</div>
+                    <button onclick="logout()" class="logout-nav-btn" title="Déconnexion">
+                        <i class="fas fa-sign-out-alt"></i> <span>Quitter</span>
+                    </button>
+                </div>
+            </header>
 
             <div class="scrollable-content">
-
-                <!-- PAGE 1: EXECUTIVE OVERVIEW -->
-                 <!-- ADMIN APPROVAL PANEL (Yodh'her ken lel Directeur) -->
-<div id="admin-approval-panel" style="display: none; background: white; padding: 20px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 20px;">
-    <h3 style="margin-top: 0; color: #1e293b; font-size: 16px;">
-        <i class="fas fa-user-shield" style="color: #ED1C24;"></i> Demandes d'accès en attente
-    </h3>
-    <div id="pending-users-list">
-        <!-- Les requêtes yjibouhom l'API w yt7attou hné -->
-    </div>
-</div>
-                <section id="page-overview" class="tab-content active">
-                    <div class="hardware-grid">
-                        <div class="hw-card">
-                            <div class="hw-header">
-                                <span>VRAM (GPU)</span>
-                                <i class="fas fa-microchip red-icon"></i>
-                            </div>
-                            <div class="hw-value"><strong>9.2</strong> / 16 GB</div>
-                            <div class="progress-bar"><div class="fill red" style="width: 57%;"></div></div>
-                            <div class="hw-footer"><span>57% utilized</span> <span class="free-text red-text">7 GB free</span></div>
-                        </div>
-                        <div class="hw-card">
-                            <div class="hw-header">
-                                <span>SYSTEM RAM</span>
-                                <i class="fas fa-memory blue-icon"></i>
-                            </div>
-                            <div class="hw-value"><strong>22.8</strong> / 32 GB</div>
-                            <div class="progress-bar"><div class="fill blue" style="width: 71%;"></div></div>
-                            <div class="hw-footer"><span>71% utilized</span> <span class="free-text blue-text">9 GB free</span></div>
-                        </div>
-                        <div class="hw-card">
-                            <div class="hw-header">
-                                <span>STORAGE NVME</span>
-                                <i class="fas fa-hdd purple-icon"></i>
-                            </div>
-                            <div class="hw-value"><strong>148</strong> / 512 GB</div>
-                            <div class="progress-bar"><div class="fill purple" style="width: 29%;"></div></div>
-                            <div class="hw-footer"><span>29% utilized</span> <span class="free-text purple-text">364 GB free</span></div>
-                        </div>
-                    </div>
-
-                    <div class="overview-grid">
-                        <div class="card">
-                            <div class="card-header-flex">
-                                <h3><i class="fas fa-database red-text"></i> Dataset Health Overview</h3>
-                                <span class="badge green-badge">Validated</span>
-                            </div>
-                            <div class="dataset-stats-grid">
-                                <div class="stat-box">
-                                    <p>TOTAL ROWS</p>
-                                    <h4>25,460</h4>
-                                </div>
-                                <div class="stat-box">
-                                    <p>UNIQUE INTENTS</p>
-                                    <h4>142</h4>
-                                </div>
-                                <div class="stat-box">
-                                    <p>AVG TOKEN LENGTH</p>
-                                    <h4>184</h4>
-                                </div>
-                                <div class="stat-box">
-                                    <p>LANGUAGES</p>
-                                    <h4>AR · DA · FR</h4>
-                                </div>
-                            </div>
-                            <div class="split-section">
-                                <p>Train / Test Split <span>90% / 10%</span></p>
-                                <div class="progress-bar"><div class="fill red" style="width: 90%;"></div></div>
-                            </div>
-                        </div>
-
-                        <div class="card repo-card">
-                            <div class="card-header-flex">
-                                <h3><i class="far fa-folder-open red-text"></i> Repository Architecture</h3>
-                                <span class="badge blue-badge">6 modules</span>
-                            </div>
-                            <div class="tree-view">
-                                <ul>
-                                    <li><i class="fas fa-chevron-down"></i> <i class="far fa-folder"></i> ooredoo-ai-framework/
-                                        <ul>
-                                            <li><i class="far fa-folder-open"></i> configs/
-                                                <ul>
-                                                    <li><i class="far fa-file-code"></i> lora_config.json</li>
-                                                    <li><i class="far fa-file-alt"></i> training_args.yaml</li>
-                                                </ul>
-                                            </li>
-                                            <li><i class="far fa-folder-open"></i> src/
-                                                <ul>
-                                                    <li><i class="fab fa-python"></i> data_pipeline.py</li>
-                                                    <li><i class="fab fa-python"></i> trainer.py</li>
-                                                </ul>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-               <!-- PAGE 2: DATA PIPELINE -->
-               {% include 'components/pipeline.html' %}
-                <!-- PAGE 3: LORA CONFIG & QUANTIZATION -->
-                <section id="page-config" class="tab-content">
-                    <div class="card config-card">
-                        <h3><i class="fas fa-bolt red-text"></i> Base Model Selection</h3>
-                        <p>Foundation model for LoRA adapter injection (LLM, STT, or TTS)</p>
-                        <select class="large-select">
-                            <option>TinyLlama/TinyLlama-1.1B-Chat-v1.0 (LLM)</option>
-                            <option>openai/whisper-small (STT)</option>
-                            <option>suno/bark-small (TTS)</option>
-                        </select>
-                        <div class="model-stats">
-                            <div class="m-stat"><span>Parameters</span><strong>1.1B</strong></div>
-                            <div class="m-stat"><span>Context</span><strong>2,048 tokens</strong></div>
-                            <div class="m-stat"><span>Architecture</span><strong>LlamaForCausalLM</strong></div>
-                            <div class="m-stat"><span>Vocab Size</span><strong>32,000</strong></div>
-                        </div>
-                    </div>
-
-                    <div class="grid-layout-2">
-                        <div class="card">
-                            <h3><i class="fas fa-sliders-h red-text"></i> LoRA Parameters Matrix</h3>
-                            <div class="number-inputs">
-                                <div class="num-group">
-                                    <label>Rank (r)</label>
-                                    <div class="stepper"><button>-</button><input type="text" value="8"><button>+</button></div>
-                                </div>
-                                <div class="num-group">
-                                    <label>Alpha (α)</label>
-                                    <div class="stepper"><button>-</button><input type="text" value="16"><button>+</button></div>
-                                </div>
-                            </div>
-                            <div class="slider-group">
-                                <label>Dropout <span class="red-text">0.05</span></label>
-                                <input type="range" min="0" max="100" value="5">
-                            </div>
-                            <div class="target-modules">
-                                <label>Target Modules</label>
-                                <div class="modules-tags">
-                                    <span class="tag active">q_proj</span>
-                                    <span class="tag active">v_proj</span>
-                                    <span class="tag">k_proj</span>
-                                    <span class="tag">o_proj</span>
-                                    <span class="tag">gate_proj</span>
-                                    <span class="tag">up_proj</span>
-                                    <span class="tag">down_proj</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card memory-card">
-                            <h3><i class="fas fa-cog red-text"></i> Memory & Optimization</h3>
-                            <div class="toggle-row">
-                                <div>
-                                    <strong>4-bit Quantization (NF4)</strong>
-                                    <p>BitsAndBytes QLoRA</p>
-                                </div>
-                                <label class="switch"><input type="checkbox" checked><span class="slider round"></span></label>
-                            </div>
-                            <div class="toggle-row">
-                                <div>
-                                    <strong>Gradient Checkpointing</strong>
-                                    <p>Reduces peak VRAM usage</p>
-                                </div>
-                                <label class="switch"><input type="checkbox" checked><span class="slider round"></span></label>
-                            </div>
-                            <div class="toggle-row">
-                                <div>
-                                    <strong>Flash Attention 2</strong>
-                                    <p>Faster attention computation</p>
-                                </div>
-                                <label class="switch"><input type="checkbox" checked><span class="slider round"></span></label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="launch-bar">
-                        <span class="config-summary">Config: <strong>r=8 · α=16 · 2 modules · 3 epochs · 4-bit NF4</strong></span>
-                        <button class="btn-primary launch-btn" onclick="switchTab('training'); startTrainingSim();"><i class="fas fa-rocket"></i> Launch Training Engine</button>
-                    </div>
-                </section>
-
-                <!-- PAGE 4: ACTIVE TRAINING MONITOR -->
-                <section id="page-training" class="tab-content">
-                    <div class="card run-header">
-                        <div class="run-info">
-                            <span class="status-dot pulsing"></span>
-                            <div>
-                                <h3>run_omni_ooredoo_v1 <span>Epoch 1 / 3 · Step <span id="current-step">128</span> / 500</span></h3>
-                                <p>TinyLlama-1.1B · LoRA r=8 · NF4 · Kaggle T4</p>
-                            </div>
-                        </div>
-                        <div class="run-metrics">
-                            <div class="metric"><span>ELAPSED</span><strong>2m 46s</strong></div>
-                            <div class="metric"><span>ETA</span><strong>~37m</strong></div>
-                            <div class="metric"><span>LOSS</span><strong class="red-text" id="current-loss">1.3849</strong></div>
-                            <div class="metric"><span>STEPS/SEC</span><strong>3.8</strong></div>
-                            <button class="btn-secondary"><i class="fas fa-pause"></i> Pause</button>
-                        </div>
-                    </div>
-                    <div class="progress-container">
-                        <div class="prog-header"><span>Overall Progress</span><span id="prog-pct">25.6%</span></div>
-                        <div class="progress-bar"><div id="main-prog-bar" class="fill red" style="width: 25.6%;"></div></div>
-                    </div>
-
-                    <div class="charts-grid">
-                        <div class="card">
-                            <div class="chart-header">
-                                <div>
-                                    <h4><i class="fas fa-chart-line red-text"></i> Training Loss</h4>
-                                    <p>Cross-entropy loss over steps</p>
-                                </div>
-                                <span class="badge red-outline" id="chart-loss-badge">1.3849</span>
-                            </div>
-                            <canvas id="lossChart" height="200"></canvas>
-                        </div>
-                        <div class="card">
-                            <div class="chart-header">
-                                <div>
-                                    <h4><i class="fas fa-wave-square blue-text"></i> Validation Metrics</h4>
-                                    <p>WER / PPL and Scheduler tracking</p>
-                                </div>
-                                <div class="badges"><span class="badge blue-outline">val_loss</span></div>
-                            </div>
-                            <canvas id="valChart" height="200"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="card terminal-card">
-                        <div class="term-header">
-                            <div><span class="mac-btn red"></span><span class="mac-btn yellow"></span><span class="mac-btn green"></span></div>
-                            <span>>_ SFTTrainer Console — run_omni_ooredoo_v1 <span class="live-text">⊙ LIVE</span></span>
-                        </div>
-                        <div class="term-body" id="term-console">
-                            <div>[12:04:31] [STEP 121] loss=1.4152 | grad_norm=0.820 | lr=1.87e-4</div>
-                            <div>[12:04:37] [STEP 123] loss=1.4096 | grad_norm=0.810 | lr=1.87e-4</div>
-                            <div>[12:04:43] [STEP 125] loss=1.4187 | grad_norm=0.800 | lr=1.87e-4</div>
-                            <div class="highlight">[12:04:49] [STEP 127] loss=1.4087 | grad_norm=0.790 | lr=1.87e-4</div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- PAGE 5: VOICE CHATBOT (PLAYGROUND) -->
-                <section id="page-chatbot" class="tab-content">
-                    <div class="playground-layout">
-                        <!-- Left sidebar for controls -->
-                        <div class="play-sidebar">
-                            <h4>ACTIVE MODEL</h4>
-                            <select class="play-select">
-                                <option>Ooredoo-Omni-LoRA-v1</option>
-                            </select>
-                            <div class="status-pill"><span class="dot green"></span> Model loaded · VRAM 9.2 GB</div>
-
-                            <h4 class="mt-4">GENERATION CONFIG</h4>
-                            <div class="slider-group">
-                                <label>Temperature <span>0.70</span></label>
-                                <input type="range" min="0" max="100" value="70">
-                            </div>
-                            <div class="slider-group">
-                                <label>Top-P <span>0.90</span></label>
-                                <input type="range" min="0" max="100" value="90">
-                            </div>
-                            <div class="slider-group">
-                                <label>Max New Tokens <span>256</span></label>
-                                <input type="range" min="0" max="512" value="256">
-                            </div>
-
-                            <h4 class="mt-4">INFERENCE STATS</h4>
-                            <div class="inf-stat"><span>Latency (LLM+TTS)</span><strong>~850ms</strong></div>
-                            <div class="inf-stat"><span>Tokens/sec</span><strong>42.8</strong></div>
-                            <div class="inf-stat"><span>Adapter</span><strong>LoRA r=8</strong></div>
-                        </div>
-
-                        <!-- Chat UI -->
-                        <div class="chat-container card">
-                            <div class="chat-header">
-                                <div>
-                                    <h3>Voice Chatbot Assistant</h3>
-                                    <p>Ooredoo-Omni-LoRA-v1 (LLM + Whisper + VITS)</p>
-                                </div>
-                                <div>
-                                    <button class="btn-outline">Clear chat</button>
-                                    <button class="btn-green-outline">Dialect-tuned</button>
-                                </div>
-                            </div>
-                            <div class="chat-messages">
-                                <div class="message bot">
-                                    <div class="msg-icon"><img src="/static/logo-ooredoo.png" alt="bot"></div>
-                                    <div class="msg-bubble">
-                                        مرحباً بك في أوريدو! كيفاش نجم نعاونك اليوم؟
-                                        <button class="audio-play-btn"><i class="fas fa-volume-up"></i></button>
-                                    </div>
-                                </div>
-                                <div class="message user">
-                                    <div class="msg-bubble">
-                                        كيفاش نعمل تحويل رصيد؟
-                                    </div>
-                                    <div class="msg-icon"><i class="far fa-user"></i></div>
-                                </div>
-                                <div class="message bot">
-                                    <div class="msg-icon"><i class="fas fa-bolt red-text"></i></div>
-                                    <div class="msg-bubble">
-                                        باش تحوّل رصيد لصاحبك، عندك طريقتين:
-                                        <br><br>
-                                        • الطريقة الأولى: اكتب *128*رقم المستقبل*المبلغ# واتصل<br>
-                                        • الطريقة الثانية: من تطبيق Ooredoo في قسم «الخدمات»
-                                        <br><br>
-                                        الحد الأدنى 0.5 دينار والأقصى 5 دينار في اليوم.
-                                        <button class="audio-play-btn"><i class="fas fa-volume-up"></i></button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="chat-input-area">
-                                <div class="input-wrapper">
-                                    <button class="mic-btn" title="Speak (STT)"><i class="fas fa-microphone"></i></button>
-                                    <input type="text" placeholder="اكتب سؤالك هنا أو استخدم الميكروفون (STT)...">
-                                    <button class="send-btn"><i class="fas fa-paper-plane"></i></button>
-                                </div>
-                                <p class="input-footer">Temperature 0.70 · Top-P 0.90 · Max 256 tokens · Press Enter to send</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- PAGE 6: BENCHMARKING -->
-                <section id="page-benchmarking" class="tab-content">
-                    <div class="card">
-                        <div class="card-header-flex" style="margin-bottom: 20px;">
-                            <h3><i class="fas fa-balance-scale red-text"></i> Model Benchmarks Directory</h3>
-                            <button class="btn-outline"><i class="fas fa-download"></i> Export CSV</button>
-                        </div>
-                        <p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">Comparison of baseline models vs. Ooredoo fine-tuned adapters across NLP and Speech tasks.</p>
-                        
-                        <table class="benchmark-table">
-                            <thead>
-                                <tr>
-                                    <th>Model Configuration</th>
-                                    <th>Task Type</th>
-                                    <th>Primary Metric</th>
-                                    <th>Latency (ms)</th>
-                                    <th>VRAM (GB)</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><strong>TinyLlama-1.1B-Chat (Base)</strong></td>
-                                    <td>LLM (Causal LM)</td>
-                                    <td>16.82 (PPL)</td>
-                                    <td>120 ms</td>
-                                    <td>4.8 GB</td>
-                                    <td><span class="badge gray-badge">Baseline</span></td>
-                                </tr>
-                                <tr class="highlight-row">
-                                    <td><strong>Ooredoo-TinyLlama-LoRA-v1</strong></td>
-                                    <td>LLM (Dialect QA)</td>
-                                    <td><strong class="green-text">8.45 (PPL)</strong></td>
-                                    <td>125 ms</td>
-                                    <td>5.1 GB</td>
-                                    <td><span class="badge green-badge">Deployed</span></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>openai/whisper-small (Base)</strong></td>
-                                    <td>STT (Transcription)</td>
-                                    <td>28.4% (WER)</td>
-                                    <td>310 ms</td>
-                                    <td>2.2 GB</td>
-                                    <td><span class="badge gray-badge">Baseline</span></td>
-                                </tr>
-                                <tr class="highlight-row">
-                                    <td><strong>Ooredoo-Whisper-TN-v2</strong></td>
-                                    <td>STT (Tunisian Dialect)</td>
-                                    <td><strong class="green-text">12.1% (WER)</strong></td>
-                                    <td>320 ms</td>
-                                    <td>2.4 GB</td>
-                                    <td><span class="badge green-badge">Testing</span></td>
-                                </tr>
-                                <tr class="highlight-row">
-                                    <td><strong>Ooredoo-VITS-TTS</strong></td>
-                                    <td>TTS (Voice Synth)</td>
-                                    <td><strong class="green-text">4.1 (MOS)</strong></td>
-                                    <td>~450 ms</td>
-                                    <td>3.5 GB</td>
-                                    <td><span class="badge green-badge">Deployed</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-
+                <!-- INJECTION DES COMPOSANTS (Jinja2) -->
+                {% include 'components/overview.html' %}
+                {% include 'components/pipeline.html' %}
+                {% include 'components/config.html' %}
+                {% include 'components/training.html' %}
+                {% include 'components/chatbot.html' %}
+                {% include 'components/benchmarking.html' %}
             </div>
         </main>
     </div>

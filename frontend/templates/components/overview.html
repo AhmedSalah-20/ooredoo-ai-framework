@@ -1,0 +1,89 @@
+<!-- ADMIN APPROVAL PANEL -->
+<div id="admin-approval-panel" style="display: none; background: white; padding: 20px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 20px;">
+    <h3 style="margin-top: 0; color: #1e293b; font-size: 16px;">
+        <i class="fas fa-user-shield" style="color: #ED1C24;"></i> Demandes d'accès en attente
+    </h3>
+    <div id="pending-users-list">
+        <!-- Les requêtes yjibouhom l'API w yt7attou hné -->
+    </div>
+</div>
+
+<section id="page-overview" class="tab-content active">
+    <!-- HW Grid -->
+    <div class="hardware-grid">
+        <div class="hw-card">
+            <div class="hw-header">
+                <span>VRAM (GPU)</span>
+                <i class="fas fa-microchip red-icon"></i>
+            </div>
+            <div class="hw-value"><strong>9.2</strong> / 16 GB</div>
+            <div class="progress-bar"><div class="fill red" style="width: 57%;"></div></div>
+            <div class="hw-footer"><span>57% utilized</span> <span class="free-text red-text">7 GB free</span></div>
+        </div>
+        <div class="hw-card">
+            <div class="hw-header">
+                <span>SYSTEM RAM</span>
+                <i class="fas fa-memory blue-icon"></i>
+            </div>
+            <div class="hw-value"><strong>22.8</strong> / 32 GB</div>
+            <div class="progress-bar"><div class="fill blue" style="width: 71%;"></div></div>
+            <div class="hw-footer"><span>71% utilized</span> <span class="free-text blue-text">9 GB free</span></div>
+        </div>
+        <div class="hw-card">
+            <div class="hw-header">
+                <span>STORAGE NVME</span>
+                <i class="fas fa-hdd purple-icon"></i>
+            </div>
+            <div class="hw-value"><strong>148</strong> / 512 GB</div>
+            <div class="progress-bar"><div class="fill purple" style="width: 29%;"></div></div>
+            <div class="hw-footer"><span>29% utilized</span> <span class="free-text purple-text">364 GB free</span></div>
+        </div>
+    </div>
+
+    <!-- Overview Grid -->
+    <div class="overview-grid">
+        <div class="card">
+            <div class="card-header-flex">
+                <h3><i class="fas fa-database red-text"></i> Dataset Health Overview</h3>
+                <span class="badge green-badge">Validated</span>
+            </div>
+            <div class="dataset-stats-grid">
+                <div class="stat-box"><p>TOTAL ROWS</p><h4>25,460</h4></div>
+                <div class="stat-box"><p>UNIQUE INTENTS</p><h4>142</h4></div>
+                <div class="stat-box"><p>AVG TOKEN LENGTH</p><h4>184</h4></div>
+                <div class="stat-box"><p>LANGUAGES</p><h4>AR · DA · FR</h4></div>
+            </div>
+            <div class="split-section">
+                <p>Train / Test Split <span>90% / 10%</span></p>
+                <div class="progress-bar"><div class="fill red" style="width: 90%;"></div></div>
+            </div>
+        </div>
+
+        <div class="card repo-card">
+            <div class="card-header-flex">
+                <h3><i class="far fa-folder-open red-text"></i> Repository Architecture</h3>
+                <span class="badge blue-badge">6 modules</span>
+            </div>
+            <div class="tree-view">
+                <ul>
+                    <li><i class="fas fa-chevron-down"></i> <i class="far fa-folder"></i> ooredoo-ai-framework/
+                        <ul>
+                            <li><i class="far fa-folder-open"></i> configs/
+                                <ul>
+                                    <li><i class="far fa-file-code"></i> lora_config.json</li>
+                                    <li><i class="far fa-file-alt"></i> training_args.yaml</li>
+                                </ul>
+                            </li>
+                            <li><i class="far fa-folder-open"></i> src/
+                                <ul>
+                                    <li><i class="fab fa-python"></i> data_pipeline.py</li>
+                                    <li><i class="fab fa-python"></i> trainer.py</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>

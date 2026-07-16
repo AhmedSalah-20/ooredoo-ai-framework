@@ -1,0 +1,78 @@
+<section id="page-chatbot" class="tab-content">
+    <div class="playground-layout">
+        <!-- Left sidebar for controls -->
+        <div class="play-sidebar">
+            <h4>ACTIVE MODEL</h4>
+            <select class="play-select">
+                <option>Ooredoo-Omni-LoRA-v1</option>
+            </select>
+            <div class="status-pill"><span class="dot green"></span> Model loaded · VRAM 9.2 GB</div>
+
+            <h4 class="mt-4">GENERATION CONFIG</h4>
+            <div class="slider-group">
+                <label>Temperature <span>0.70</span></label>
+                <input type="range" min="0" max="100" value="70">
+            </div>
+            <div class="slider-group">
+                <label>Top-P <span>0.90</span></label>
+                <input type="range" min="0" max="100" value="90">
+            </div>
+            <div class="slider-group">
+                <label>Max New Tokens <span>256</span></label>
+                <input type="range" min="0" max="512" value="256">
+            </div>
+
+            <h4 class="mt-4">INFERENCE STATS</h4>
+            <div class="inf-stat"><span>Latency (LLM+TTS)</span><strong>~850ms</strong></div>
+            <div class="inf-stat"><span>Tokens/sec</span><strong>42.8</strong></div>
+            <div class="inf-stat"><span>Adapter</span><strong>LoRA r=8</strong></div>
+        </div>
+
+        <!-- Chat UI -->
+        <div class="chat-container card">
+            <div class="chat-header">
+                <div>
+                    <h3>Voice Chatbot Assistant</h3>
+                    <p>Ooredoo-Omni-LoRA-v1 (LLM + Whisper + VITS)</p>
+                </div>
+                <div>
+                    <button class="btn-outline">Clear chat</button>
+                    <button class="btn-green-outline">Dialect-tuned</button>
+                </div>
+            </div>
+            <div class="chat-messages">
+                <div class="message bot">
+                    <div class="msg-icon"><img src="/static/logo-ooredoo.png" alt="bot"></div>
+                    <div class="msg-bubble">
+                        مرحباً بك في أوريدو! كيفاش نجم نعاونك اليوم؟
+                        <button class="audio-play-btn"><i class="fas fa-volume-up"></i></button>
+                    </div>
+                </div>
+                <div class="message user">
+                    <div class="msg-bubble">كيفاش نعمل تحويل رصيد؟</div>
+                    <div class="msg-icon"><i class="far fa-user"></i></div>
+                </div>
+                <div class="message bot">
+                    <div class="msg-icon"><i class="fas fa-bolt red-text"></i></div>
+                    <div class="msg-bubble">
+                        باش تحوّل رصيد لصاحبك، عندك طريقتين:
+                        <br><br>
+                        • الطريقة الأولى: اكتب *128*رقم المستقبل*المبلغ# واتصل<br>
+                        • الطريقة الثانية: من تطبيق Ooredoo في قسم «الخدمات»
+                        <br><br>
+                        الحد الأدنى 0.5 دينار والأقصى 5 دينار في اليوم.
+                        <button class="audio-play-btn"><i class="fas fa-volume-up"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <div class="input-wrapper">
+                    <button class="mic-btn" title="Speak (STT)"><i class="fas fa-microphone"></i></button>
+                    <input type="text" placeholder="اكتب سؤالك هنا أو استخدم الميكروفون (STT)...">
+                    <button class="send-btn"><i class="fas fa-paper-plane"></i></button>
+                </div>
+                <p class="input-footer">Temperature 0.70 · Top-P 0.90 · Max 256 tokens · Press Enter to send</p>
+            </div>
+        </div>
+    </div>
+</section>

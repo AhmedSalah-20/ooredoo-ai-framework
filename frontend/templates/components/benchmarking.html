@@ -1,0 +1,64 @@
+<section id="page-benchmarking" class="tab-content">
+    <div class="card">
+        <div class="card-header-flex" style="margin-bottom: 20px;">
+            <h3><i class="fas fa-balance-scale red-text"></i> Model Benchmarks Directory</h3>
+            <button class="btn-outline"><i class="fas fa-download"></i> Export CSV</button>
+        </div>
+        <p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">Comparison of baseline models vs. Ooredoo fine-tuned adapters across NLP and Speech tasks.</p>
+        
+        <table class="benchmark-table">
+            <thead>
+                <tr>
+                    <th>Model Configuration</th>
+                    <th>Task Type</th>
+                    <th>Primary Metric</th>
+                    <th>Latency (ms)</th>
+                    <th>VRAM (GB)</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>TinyLlama-1.1B-Chat (Base)</strong></td>
+                    <td>LLM (Causal LM)</td>
+                    <td>16.82 (PPL)</td>
+                    <td>120 ms</td>
+                    <td>4.8 GB</td>
+                    <td><span class="badge gray-badge">Baseline</span></td>
+                </tr>
+                <tr class="highlight-row">
+                    <td><strong>Ooredoo-TinyLlama-LoRA-v1</strong></td>
+                    <td>LLM (Dialect QA)</td>
+                    <td><strong class="green-text">8.45 (PPL)</strong></td>
+                    <td>125 ms</td>
+                    <td>5.1 GB</td>
+                    <td><span class="badge green-badge">Deployed</span></td>
+                </tr>
+                <tr>
+                    <td><strong>openai/whisper-small (Base)</strong></td>
+                    <td>STT (Transcription)</td>
+                    <td>28.4% (WER)</td>
+                    <td>310 ms</td>
+                    <td>2.2 GB</td>
+                    <td><span class="badge gray-badge">Baseline</span></td>
+                </tr>
+                <tr class="highlight-row">
+                    <td><strong>Ooredoo-Whisper-TN-v2</strong></td>
+                    <td>STT (Tunisian Dialect)</td>
+                    <td><strong class="green-text">12.1% (WER)</strong></td>
+                    <td>320 ms</td>
+                    <td>2.4 GB</td>
+                    <td><span class="badge green-badge">Testing</span></td>
+                </tr>
+                <tr class="highlight-row">
+                    <td><strong>Ooredoo-VITS-TTS</strong></td>
+                    <td>TTS (Voice Synth)</td>
+                    <td><strong class="green-text">4.1 (MOS)</strong></td>
+                    <td>~450 ms</td>
+                    <td>3.5 GB</td>
+                    <td><span class="badge green-badge">Deployed</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>

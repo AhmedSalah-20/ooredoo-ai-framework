@@ -1,0 +1,79 @@
+<section id="page-config" class="tab-content">
+    <div class="card config-card">
+        <h3><i class="fas fa-bolt red-text"></i> Base Model Selection</h3>
+        <p>Foundation model for LoRA adapter injection (LLM, STT, or TTS)</p>
+        <select class="large-select">
+            <option>TinyLlama/TinyLlama-1.1B-Chat-v1.0 (LLM)</option>
+            <option>openai/whisper-small (STT)</option>
+            <option>suno/bark-small (TTS)</option>
+        </select>
+        <div class="model-stats">
+            <div class="m-stat"><span>Parameters</span><strong>1.1B</strong></div>
+            <div class="m-stat"><span>Context</span><strong>2,048 tokens</strong></div>
+            <div class="m-stat"><span>Architecture</span><strong>LlamaForCausalLM</strong></div>
+            <div class="m-stat"><span>Vocab Size</span><strong>32,000</strong></div>
+        </div>
+    </div>
+
+    <div class="grid-layout-2">
+        <div class="card">
+            <h3><i class="fas fa-sliders-h red-text"></i> LoRA Parameters Matrix</h3>
+            <div class="number-inputs">
+                <div class="num-group">
+                    <label>Rank (r)</label>
+                    <div class="stepper"><button>-</button><input type="text" value="8"><button>+</button></div>
+                </div>
+                <div class="num-group">
+                    <label>Alpha (α)</label>
+                    <div class="stepper"><button>-</button><input type="text" value="16"><button>+</button></div>
+                </div>
+            </div>
+            <div class="slider-group">
+                <label>Dropout <span class="red-text">0.05</span></label>
+                <input type="range" min="0" max="100" value="5">
+            </div>
+            <div class="target-modules">
+                <label>Target Modules</label>
+                <div class="modules-tags">
+                    <span class="tag active">q_proj</span>
+                    <span class="tag active">v_proj</span>
+                    <span class="tag">k_proj</span>
+                    <span class="tag">o_proj</span>
+                    <span class="tag">gate_proj</span>
+                    <span class="tag">up_proj</span>
+                    <span class="tag">down_proj</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card memory-card">
+            <h3><i class="fas fa-cog red-text"></i> Memory & Optimization</h3>
+            <div class="toggle-row">
+                <div>
+                    <strong>4-bit Quantization (NF4)</strong>
+                    <p>BitsAndBytes QLoRA</p>
+                </div>
+                <label class="switch"><input type="checkbox" checked><span class="slider round"></span></label>
+            </div>
+            <div class="toggle-row">
+                <div>
+                    <strong>Gradient Checkpointing</strong>
+                    <p>Reduces peak VRAM usage</p>
+                </div>
+                <label class="switch"><input type="checkbox" checked><span class="slider round"></span></label>
+            </div>
+            <div class="toggle-row">
+                <div>
+                    <strong>Flash Attention 2</strong>
+                    <p>Faster attention computation</p>
+                </div>
+                <label class="switch"><input type="checkbox" checked><span class="slider round"></span></label>
+            </div>
+        </div>
+    </div>
+
+    <div class="launch-bar">
+        <span class="config-summary">Config: <strong>r=8 · α=16 · 2 modules · 3 epochs · 4-bit NF4</strong></span>
+        <button class="btn-primary launch-btn" onclick="switchTab('training'); startTrainingSim();"><i class="fas fa-rocket"></i> Launch Training Engine</button>
+    </div>
+</section>
