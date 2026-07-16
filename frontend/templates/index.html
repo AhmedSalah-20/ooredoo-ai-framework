@@ -62,22 +62,38 @@
 
         <!-- MAIN CONTENT -->
         <main class="main-content">
-            <!-- TOP NAVBAR -->
-            <header class="top-nav">
-                <h2 id="page-title"><i class="fas fa-chart-pie"></i> Executive Overview</h2>
-                <div class="top-controls">
-                    <select class="model-selector">
-                        <option>ooredoo-llm-v1</option>
-                        <option>ooredoo-stt-whisper</option>
-                        <option>ooredoo-tts-vits</option>
-                    </select>
-                    <div class="avatar small">AS</div>
-                </div>
-            </header>
+           <!-- TOP NAVBAR -->
+<header class="top-nav">
+    <h2 id="page-title"><i class="fas fa-chart-pie"></i> Executive Overview</h2>
+    
+    <div class="top-controls" style="display: flex; align-items: center; gap: 15px;">
+        <select class="model-selector">
+            <option>ooredoo-llm-v1</option>
+            <option>ooredoo-stt-whisper</option>
+            <option>ooredoo-tts-vits</option>
+        </select>
+        
+        <div class="avatar small">AS</div>
+        
+        <!-- فلسة الخروج الجديدة -->
+        <button onclick="logout()" class="logout-nav-btn" title="Déconnexion">
+            <i class="fas fa-sign-out-alt"></i> <span>Quitter</span>
+        </button>
+    </div>
+</header>
 
             <div class="scrollable-content">
 
                 <!-- PAGE 1: EXECUTIVE OVERVIEW -->
+                 <!-- ADMIN APPROVAL PANEL (Yodh'her ken lel Directeur) -->
+<div id="admin-approval-panel" style="display: none; background: white; padding: 20px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 20px;">
+    <h3 style="margin-top: 0; color: #1e293b; font-size: 16px;">
+        <i class="fas fa-user-shield" style="color: #ED1C24;"></i> Demandes d'accès en attente
+    </h3>
+    <div id="pending-users-list">
+        <!-- Les requêtes yjibouhom l'API w yt7attou hné -->
+    </div>
+</div>
                 <section id="page-overview" class="tab-content active">
                     <div class="hardware-grid">
                         <div class="hw-card">

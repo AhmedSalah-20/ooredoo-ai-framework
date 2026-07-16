@@ -222,3 +222,29 @@ input:checked + .slider:before { transform: translateX(20px); }
 .benchmark-table th { padding: 15px; background: #F8FAFC; border-bottom: 2px solid var(--border); font-size: 13px; color: var(--text-muted); font-weight: 600; }
 .benchmark-table td { padding: 15px; border-bottom: 1px solid var(--border); font-size: 14px; }
 .highlight-row { background: #FEF2F2; }
+.logout-nav-btn {
+    background-color: transparent;
+    color: #ED1C24; /* أحمر Ooredoo */
+    border: 1px solid #ED1C24;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.logout-nav-btn:hover {
+    background-color: #ED1C24;
+    color: white;
+}
+
+/* كان الشاشة صغيرة برشا، نخبّيو الكلمة ونخليو كان الـ Icon */
+@media (max-width: 600px) {
+    .logout-nav-btn span {
+        display: none;
+    }
+}

@@ -1,0 +1,12 @@
+{
+    "directeur@ooredoo.tn": {
+        "password": "admin",
+        "role": "Administrateur",
+        "status": "active"
+    },
+    "ahmedaminsaleh9@gmail.com": {
+        "password": "asas290920",
+        "role": "MLOps Engineer",
+        "status": "active"
+    }
+}

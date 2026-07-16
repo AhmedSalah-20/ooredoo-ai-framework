@@ -3,218 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ooredoo AI Framework - Login</title>
+    <title>Ooredoo AI - Auth</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --ooredoo-red: #ED1C24;
-            --ooredoo-dark: #b8161c;
-            --bg-color: #f8fafc;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --white: #ffffff;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background-image: radial-gradient(circle at top right, #fde8e9 0%, #f8fafc 40%);
-        }
-
-        .login-container {
-            background: var(--white);
-            width: 100%;
-            max-width: 420px;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e2e8f0;
-        }
-
-        .logo-section {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .logo-section i {
-            font-size: 40px;
-            color: var(--ooredoo-red);
-            margin-bottom: 15px;
-        }
-
-        .logo-section h2 {
-            color: var(--text-main);
-            font-size: 22px;
-            font-weight: 700;
-        }
-
-        .logo-section p {
-            color: var(--text-muted);
-            font-size: 14px;
-            margin-top: 5px;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-main);
-            font-weight: 500;
-            font-size: 14px;
-        }
-
-        .input-wrapper {
-            position: relative;
-        }
-
-        .input-wrapper i {
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #94a3b8;
-        }
-
-        .input-wrapper input {
-            width: 100%;
-            padding: 12px 12px 12px 40px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: 14px;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-
-        .input-wrapper input:focus {
-            border-color: var(--ooredoo-red);
-            box-shadow: 0 0 0 3px rgba(237, 28, 36, 0.1);
-        }
-
-        .error-message {
-            color: var(--ooredoo-red);
-            font-size: 13px;
-            margin-bottom: 15px;
-            display: none;
-            text-align: center;
-            background: #fef2f2;
-            padding: 10px;
-            border-radius: 6px;
-        }
-
-        .login-btn {
-            width: 100%;
-            background: var(--ooredoo-red);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .login-btn:hover {
-            background: var(--ooredoo-dark);
-        }
-
-        .footer-text {
-            text-align: center;
-            margin-top: 25px;
-            font-size: 12px;
-            color: #94a3b8;
-        }
+        :root { --ooredoo-red: #ED1C24; --bg-color: #f8fafc; --text-main: #1e293b; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-color); display: flex; align-items: center; justify-content: center; height: 100vh; }
+        .auth-container { background: white; width: 100%; max-width: 420px; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .logo-section { text-align: center; margin-bottom: 30px; }
+        .logo-section i { font-size: 40px; color: var(--ooredoo-red); }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; }
+        .input-wrapper { position: relative; }
+        .input-wrapper i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+        .input-wrapper input, .input-wrapper select { width: 100%; padding: 12px 12px 12px 40px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; }
+        .btn { width: 100%; background: var(--ooredoo-red); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .switch-text { text-align: center; margin-top: 15px; font-size: 14px; cursor: pointer; color: var(--ooredoo-red); }
+        .alert { padding: 10px; border-radius: 6px; margin-bottom: 15px; display: none; text-align: center; font-size: 14px; }
+        .alert-error { background: #fef2f2; color: #b91c1c; }
+        .alert-success { background: #f0fdf4; color: #15803d; }
     </style>
 </head>
 <body>
 
-    <div class="login-container">
-        <div class="logo-section">
-            <i class="fas fa-network-wired"></i>
-            <h2>Ooredoo AI Framework</h2>
-            <p>Enterprise Management Console</p>
-        </div>
-
-        <div id="error-box" class="error-message">
-            <i class="fas fa-exclamation-circle"></i> Invalid credentials.
-        </div>
-
-        <form id="login-form">
-            <div class="input-group">
-                <label>Email Address</label>
-                <div class="input-wrapper">
-                    <i class="fas fa-envelope"></i>
-                    <input type="email" id="email" placeholder="name@ooredoo.tn" required>
-                </div>
-            </div>
-
-            <div class="input-group">
-                <label>Password</label>
-                <div class="input-wrapper">
-                    <i class="fas fa-lock"></i>
-                    <input type="password" id="password" placeholder="••••••••" required>
-                </div>
-            </div>
-
-            <button type="submit" class="login-btn" id="submit-btn">
-                <span>Sign In</span>
-                <i class="fas fa-arrow-right"></i>
-            </button>
-        </form>
-
-        <div class="footer-text">
-            &copy; 2026 Ooredoo Data & AI Department. All rights reserved.
-        </div>
+<div class="auth-container">
+    <div class="logo-section">
+        <i class="fas fa-network-wired"></i>
+        <h2 id="form-title">Connexion</h2>
     </div>
 
-    <script>
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const btn = document.getElementById('submit-btn');
-            const errorBox = document.getElementById('error-box');
+    <div id="alert-box" class="alert"></div>
 
-            // Animation simple du bouton
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
-            btn.style.opacity = '0.8';
-            errorBox.style.display = 'none';
+    <!-- LOGIN FORM -->
+    <form id="login-form">
+        <div class="input-group">
+            <label>Email</label>
+            <div class="input-wrapper"><i class="fas fa-envelope"></i><input type="email" id="log-email" required></div>
+        </div>
+        <div class="input-group">
+            <label>Mot de passe</label>
+            <div class="input-wrapper"><i class="fas fa-lock"></i><input type="password" id="log-pass" required></div>
+        </div>
+        <button type="submit" class="btn">Sign In</button>
+        <div class="switch-text" onclick="toggleForm('signup')">Créer un compte (Demande d'accès)</div>
+    </form>
 
-            // Simulation d'un appel API vers FastAPI (à remplacer par le vrai fetch plus tard)
-            setTimeout(() => {
-                // Mock Logic
-                if (email === "directeur@ooredoo.tn" && password === "admin123") {
-                    localStorage.setItem("userRole", "directeur");
-                    window.location.href = "/dashboard"; // أو '/' حسب الـ routing في FastAPI
-                } else if (email === "tech@ooredoo.tn" && password === "tech123") {
-                    localStorage.setItem("userRole", "encadrant");
-                    window.location.href = "/dashboard";
-                } else {
-                    errorBox.style.display = 'block';
-                    btn.innerHTML = '<span>Sign In</span> <i class="fas fa-arrow-right"></i>';
-                    btn.style.opacity = '1';
-                }
-            }, 1000);
-        });
-    </script>
+    <!-- SIGNUP FORM -->
+    <form id="signup-form" style="display: none;">
+        <div class="input-group">
+            <label>Email Ooredoo</label>
+            <div class="input-wrapper"><i class="fas fa-envelope"></i><input type="email" id="sign-email" required></div>
+        </div>
+        <div class="input-group">
+            <label>Rôle souhaité</label>
+            <div class="input-wrapper">
+                <i class="fas fa-user-tag"></i>
+                <select id="sign-role">
+                    <option value="MLOps Engineer">MLOps Engineer</option>
+                    <option value="Administrateur">Administrateur</option>
+                </select>
+            </div>
+        </div>
+        <div class="input-group">
+            <label>Mot de passe</label>
+            <div class="input-wrapper"><i class="fas fa-lock"></i><input type="password" id="sign-pass" required></div>
+        </div>
+        <!-- زدنا خانة تأكيد كلمة السر هنا 👇 -->
+        <div class="input-group">
+            <label>Confirmer le mot de passe</label>
+            <div class="input-wrapper"><i class="fas fa-check-circle"></i><input type="password" id="sign-pass-confirm" required></div>
+        </div>
+
+        <button type="submit" class="btn">Soumettre la demande</button>
+        <div class="switch-text" onclick="toggleForm('login')">Déjà un compte ? Se connecter</div>
+    </form>
+</div>
+
+<script>
+    function toggleForm(type) {
+        document.getElementById('alert-box').style.display = 'none';
+        if(type === 'signup') {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('signup-form').style.display = 'block';
+            document.getElementById('form-title').innerText = "Demande d'accès";
+        } else {
+            document.getElementById('signup-form').style.display = 'none';
+            document.getElementById('login-form').style.display = 'block';
+            document.getElementById('form-title').innerText = "Connexion";
+        }
+    }
+
+    function showAlert(msg, isSuccess = false) {
+        const box = document.getElementById('alert-box');
+        box.innerText = msg;
+        box.className = isSuccess ? 'alert alert-success' : 'alert alert-error';
+        box.style.display = 'block';
+    }
+
+    // Submission متاع الـ Sign Up
+    document.getElementById('signup-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const password = document.getElementById('sign-pass').value;
+        const confirmPassword = document.getElementById('sign-pass-confirm').value;
+
+        // 👇 زدنا التثبت من كلمة السر هنا
+        if (password !== confirmPassword) {
+            showAlert("Les mots de passe ne correspondent pas!", false);
+            return; // نوقفو الـ fonction ما نبعثوش الـ request
+        }
+
+        const data = new FormData();
+        data.append('email', document.getElementById('sign-email').value);
+        data.append('password', password);
+        data.append('role', document.getElementById('sign-role').value);
+
+        const res = await fetch('/api/signup', { method: 'POST', body: data });
+        const result = await res.json();
+
+        if(res.ok) {
+            showAlert(result.message, true);
+            // نفضيو الخانات بعد ما ينجح التسجيل
+            document.getElementById('signup-form').reset();
+            setTimeout(() => toggleForm('login'), 3000);
+        } else {
+            showAlert(result.message, false);
+        }
+    });
+
+    // Submission متاع الـ Login
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = new FormData();
+        data.append('email', document.getElementById('log-email').value);
+        data.append('password', document.getElementById('log-pass').value);
+
+        const res = await fetch('/api/login', { method: 'POST', body: data });
+        const result = await res.json();
+
+        if(res.ok) {
+            localStorage.setItem("userRole", result.role);
+            localStorage.setItem("userEmail", result.email);
+            window.location.href = "/dashboard";
+        } else {
+            showAlert(result.message, false);
+        }
+    });
+</script>
+
 </body>
 </html>

@@ -280,4 +280,109 @@ async function runPipeline(event) {
         statusText.innerHTML = "❌ Connection failed.";
         statusText.style.color = "#dc2626";
     }
+
+}
+// ==========================================
+// 4. AUTH & LOGOUT (PROTECTION DU DASHBOARD)
+// ==========================================
+
+function checkAuth() {
+    const userRole = localStorage.getItem("userRole");
+    if (!userRole) {
+        // replace تفسخ الـ Dashboard من تاريخ المتصفح باش ما يرجعش بالـ precedent
+        window.location.replace("/login"); 
+    }
+}
+
+// تخدم أول ما تتحل الصفحة
+document.addEventListener("DOMContentLoaded", () => {
+    const userRole = localStorage.getItem("userRole");
+    
+    // Ken l'utilisateur mouch connecté, nraj3ouh lel login
+    if (!userRole) {
+        window.location.replace("/login");
+        return; // نقصو التنفيذ هنا باش ما يكملش يقرا الباقي
+    }
+
+    console.log("Bienvenue ! Role actuel :", userRole);
+    
+    // كان السيد مدير، نظهرو الـ panel ونجيبو الـ data
+    if (userRole === "Administrateur") {
+        const panel = document.getElementById('admin-approval-panel');
+        if (panel) {
+            panel.style.display = 'block';
+            fetchPendingUsers();
+        }
+    }
+});
+
+// تخدم حتى كي يرجع لتالي بالـ Back button (BFCache Support)
+window.addEventListener('pageshow', (event) => {
+    checkAuth();
+});
+
+// Fonction de Déconnexion
+function logout() {
+    // Fassa5 les données mel navigateur
+    localStorage.removeItem("userRole");
+    localStorage.removeItem("userEmail");
+    // Raja3 l'utilisateur lel page login
+    window.location.replace("/login");
+}
+
+// Fonction bech tjib les requêtes mel backend
+async function fetchPendingUsers() {
+    const res = await fetch('/api/admin/pending', {
+        headers: {
+            'X-User-Email': localStorage.getItem("userEmail")
+        }
+    });
+    
+    if (res.status === 403 || res.status === 401) {
+        console.log("Accès refusé. Vous n'êtes pas Admin.");
+        return;
+    }
+    
+    const data = await res.json();
+    const container = document.getElementById('pending-users-list');
+    
+    if (data.pending_users.length === 0) {
+        container.innerHTML = "<p style='color: #64748b; font-size: 14px; margin: 0;'>Aucune demande en attente.</p>";
+        return;
+    }
+
+    let html = '<table style="width: 100%; text-align: left; border-collapse: collapse; margin-top: 10px;">';
+    data.pending_users.forEach(u => {
+        html += `
+            <tr style="border-bottom: 1px solid #e2e8f0;">
+                <td style="padding: 10px;"><strong>${u.email}</strong></td>
+                <td style="padding: 10px;"><span style="background: #e2e8f0; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">${u.role}</span></td>
+                <td style="padding: 10px; text-align: right;">
+                    <button onclick="handleApproval('${u.email}', 'accept')" style="background: #16a34a; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; margin-right: 5px; font-weight: bold;"><i class="fas fa-check"></i> Accepter</button>
+                    <button onclick="handleApproval('${u.email}', 'reject')" style="background: #dc2626; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold;"><i class="fas fa-times"></i> Refuser</button>
+                </td>
+            </tr>
+        `;
+    });
+    html += '</table>';
+    container.innerHTML = html;
+}
+
+// Fonction bech tab3eth l'approbation lel backend
+async function handleApproval(email, action) {
+    const data = new FormData();
+    data.append('email', email);
+    data.append('action', action);
+
+    const res = await fetch('/api/admin/approve', { 
+        method: 'POST', 
+        body: data, 
+        headers: { 
+            'X-User-Email': localStorage.getItem("userEmail") 
+        } 
+    });
+    
+    const result = await res.json();
+    alert(result.message); // Y5arej popup feha "Compte activé"
+    fetchPendingUsers(); // Ya3mel mise à jour lel liste instantanément
 }
