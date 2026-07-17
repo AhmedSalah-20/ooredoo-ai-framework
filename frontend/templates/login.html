@@ -101,53 +101,78 @@
         box.style.display = 'block';
     }
 
-    // Submission متاع الـ Sign Up
+    // ==========================================
+    // 1. Submission متاع الـ Sign Up
+    // ==========================================
     document.getElementById('signup-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
+    e.preventDefault();
+    
+    const email = document.getElementById('sign-email').value;
+    const role = document.getElementById('sign-role').value;
+    const password = document.getElementById('sign-pass').value;
+    const confirmPassword = document.getElementById('sign-pass-confirm').value;
+
+    if (password !== confirmPassword) {
+        showAlert("Les mots de passe ne correspondent pas!", false);
+        return;
+    }
+
+    try {
+        const res = await fetch('/api/signup', { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email, password: password, role: role })
+        });
         
-        const password = document.getElementById('sign-pass').value;
-        const confirmPassword = document.getElementById('sign-pass-confirm').value;
-
-        // 👇 زدنا التثبت من كلمة السر هنا
-        if (password !== confirmPassword) {
-            showAlert("Les mots de passe ne correspondent pas!", false);
-            return; // نوقفو الـ fonction ما نبعثوش الـ request
-        }
-
-        const data = new FormData();
-        data.append('email', document.getElementById('sign-email').value);
-        data.append('password', password);
-        data.append('role', document.getElementById('sign-role').value);
-
-        const res = await fetch('/api/signup', { method: 'POST', body: data });
         const result = await res.json();
 
         if(res.ok) {
-            showAlert(result.message, true);
-            // نفضيو الخانات بعد ما ينجح التسجيل
+            showAlert(result.message || "Demande envoyée avec succès", true);
             document.getElementById('signup-form').reset();
             setTimeout(() => toggleForm('login'), 3000);
         } else {
-            showAlert(result.message, false);
+            // 👇 هوني الحل: كان الغلطة 422، نكتبوها بطريقة تفهمها الـ interface
+            if (res.status === 422 && Array.isArray(result.detail)) {
+                // نخرجوا الـ msg متاع أول غلطة تقابلنا
+                showAlert(result.detail[0].msg, false);
+            } else {
+                showAlert(result.detail || result.message || "Erreur d'inscription", false);
+            }
         }
-    });
+    } catch (err) {
+        showAlert("Erreur de connexion au serveur", false);
+    }
+});
 
-    // Submission متاع الـ Login
+    // ==========================================
+    // 2. Submission متاع الـ Login
+    // ==========================================
     document.getElementById('login-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const data = new FormData();
-        data.append('email', document.getElementById('log-email').value);
-        data.append('password', document.getElementById('log-pass').value);
+        
+        const emailVal = document.getElementById('log-email').value;
+        const passVal = document.getElementById('log-pass').value;
 
-        const res = await fetch('/api/login', { method: 'POST', body: data });
-        const result = await res.json();
+        try {
+            // إرسال البيانات كـ JSON
+            const res = await fetch('/api/login', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: emailVal, password: passVal })
+            });
+            
+            const result = await res.json();
 
-        if(res.ok) {
-            localStorage.setItem("userRole", result.role);
-            localStorage.setItem("userEmail", result.email);
-            window.location.href = "/dashboard";
-        } else {
-            showAlert(result.message, false);
+            if(res.ok) {
+                localStorage.setItem("userRole", result.role);
+                localStorage.setItem("userEmail", emailVal);
+                window.location.href = "/dashboard";
+            } else {
+                // صلحنا مشكلة الـ undefined
+                showAlert(result.detail || result.message || "Erreur de connexion", false);
+            }
+        } catch (err) {
+            showAlert("Erreur de connexion au serveur", false);
         }
     });
 </script>

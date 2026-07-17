@@ -19,23 +19,50 @@
                     <img src="/static/logo-ooredoo.png" alt="Ooredoo" class="ooredoo-logo" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Ooredoo_logo.svg/512px-Ooredoo_logo.svg.png'">
                 </div>
                 
-                <div class="sidebar-menu">
-                    <p class="menu-label">WORKSPACE</p>
-                    <button class="menu-btn active" onclick="switchTab('overview')"><i class="fas fa-chart-pie"></i> Executive Overview<span class="active-dot"></span></button>
-                    <button class="menu-btn" onclick="switchTab('pipeline')"><i class="fas fa-database"></i> Data Pipeline</button>
-                    <button class="menu-btn" onclick="switchTab('config')"><i class="fas fa-cog"></i> LoRA & Quantization</button>
-                    <button class="menu-btn" onclick="switchTab('training')"><i class="fas fa-rocket"></i> Active Training</button>
-                    <button class="menu-btn" onclick="switchTab('chatbot')"><i class="fas fa-comment-dots"></i> Voice Chatbot</button>
-                    <button class="menu-btn" onclick="switchTab('benchmarking')"><i class="fas fa-balance-scale"></i> Benchmarking</button>
-                </div>
+                <!-- SIDEBAR MENU -->
+<div class="sidebar-menu">
+    <p class="menu-label">WORKSPACE</p>
+    
+    <!-- 🟢 مشترك: Executive Overview -->
+    <button class="menu-btn active" onclick="switchTab('overview')">
+        <i class="fas fa-chart-pie"></i> Executive Overview
+        <span class="active-dot"></span>
+    </button>
+
+    <!-- ⚙️ خاص بالـ MLOps Engineer -->
+    {% if user_role == 'mlops' %}
+        <button class="menu-btn" onclick="switchTab('pipeline')"><i class="fas fa-database"></i> Data Pipeline</button>
+        <button class="menu-btn" onclick="switchTab('config')"><i class="fas fa-cog"></i> LoRA & Quantization</button>
+        <button class="menu-btn" onclick="switchTab('training')"><i class="fas fa-rocket"></i> Active Training</button>
+        <button class="menu-btn" onclick="switchTab('benchmarking')"><i class="fas fa-balance-scale"></i> Benchmarking</button>
+    {% endif %}
+
+    <!-- 👑 خاص بالـ Administrateur -->
+    {% if user_role == 'admin' %}
+        <button class="menu-btn" onclick="switchTab('user-management')"><i class="fas fa-users-cog"></i> User Management</button>
+    {% endif %}
+
+    <!-- 🟢 مشترك: Voice Chatbot -->
+    <button class="menu-btn" onclick="switchTab('chatbot')"><i class="fas fa-comment-dots"></i> Voice Chatbot</button>
+</div>
             </div>
 
             <!-- USER PROFILE FOOTER -->
             <div class="user-profile">
-                <div class="avatar">AS</div>
+                <div class="avatar">{{ user_name[:2] | upper }}</div>
                 <div class="user-info">
-                    <h4>Ahmed Amine Salah</h4>
-                    <p>ML Engineer · Ooredoo TN</p>
+                    <h4>{{ user_name }}</h4>
+                    {% if user_role == 'mlops' %}
+            <p>ML Engineer · Ooredoo TN</p>
+        
+        <!-- كان مكونكتي Admin -->
+        {% elif user_role == 'admin' %}
+            <p>Directeur AI · Ooredoo TN</p>
+            
+        <!-- أي دور آخر -->
+        {% else %}
+            <p>{{ user_title }}</p>
+        {% endif %}
                 </div>
             </div>
         </aside>
@@ -51,7 +78,7 @@
                         <option>ooredoo-stt-whisper</option>
                         <option>ooredoo-tts-vits</option>
                     </select>
-                    <div class="avatar small">AS</div>
+                    <div class="avatar small">{{ user_name[:2] | upper }}</div>
                     <button onclick="logout()" class="logout-nav-btn" title="Déconnexion">
                         <i class="fas fa-sign-out-alt"></i> <span>Quitter</span>
                     </button>
@@ -59,14 +86,23 @@
             </header>
 
             <div class="scrollable-content">
-                <!-- INJECTION DES COMPOSANTS (Jinja2) -->
-                {% include 'components/overview.html' %}
-                {% include 'components/pipeline.html' %}
-                {% include 'components/config.html' %}
-                {% include 'components/training.html' %}
-                {% include 'components/chatbot.html' %}
-                {% include 'components/benchmarking.html' %}
-            </div>
+    <!-- 🟢 مشترك -->
+    {% include 'components/overview.html' %}
+    {% include 'components/chatbot.html' %}
+
+    <!-- ⚙️ خاص بالـ MLOps -->
+    {% if user_role == 'mlops' %}
+        {% include 'components/pipeline.html' %}
+        {% include 'components/config.html' %}
+        {% include 'components/training.html' %}
+        {% include 'components/benchmarking.html' %}
+    {% endif %}
+
+    <!-- 👑 خاص بالـ Admin -->
+    {% if user_role == 'admin' %}
+        {% include 'components/user_management.html' %}
+    {% endif %}
+</div>
         </main>
     </div>
 

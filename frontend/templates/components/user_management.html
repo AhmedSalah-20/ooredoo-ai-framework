@@ -1,0 +1,54 @@
+<section id="page-user-management" class="tab-content" style="display: none;">
+    <div class="card run-header" style="margin-bottom: 20px;">
+        <div class="run-info">
+            <i class="fas fa-users-cog" style="font-size: 24px; color: #ED1C24;"></i>
+            <div style="margin-left: 15px;">
+                <h3>Gestion des Accès et Utilisateurs</h3>
+                <p>Validation des demandes en attente pour le framework AI</p>
+            </div>
+        </div>
+        <div class="run-metrics">
+            <!-- زدنا IDs للأرقام باش نبدلوهم بـ JS -->
+            <div class="metric"><span>TOTAL USERS</span><strong id="total-users-count">0</strong></div>
+            <div class="metric"><span>EN ATTENTE</span><strong class="red-text" id="pending-users-count">0</strong></div>
+        </div>
+    </div>
+
+    <!-- جدول الطلبات في الانتظار -->
+    <div class="card">
+        <h3 style="margin-bottom: 15px;"><i class="fas fa-user-clock red-text"></i> Demandes en attente</h3>
+        <table class="benchmark-table">
+            <thead>
+                <tr>
+                    <th>Nom d'utilisateur</th>
+                    <th>Département</th>
+                    <th>Rôle demandé</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <!-- فسخنا الـ tr القدام وخلينا الـ tbody فارغ -->
+            <tbody id="admin-pending-users">
+            </tbody>
+        </table>
+    </div>
+
+    <!-- جدول المستعملين النشطين -->
+    <div class="card mt-4" style="margin-top: 20px;">
+        <h3 style="margin-bottom: 15px;"><i class="fas fa-users blue-text"></i> Utilisateurs Actifs</h3>
+        <p style="color: #64748b; font-size: 14px;">Liste des employés ayant actuellement accès au système.</p>
+        
+        <table class="benchmark-table" style="margin-top: 15px;">
+            <thead>
+                <tr>
+                    <th>Nom d'utilisateur</th>
+                    <th>Département</th>
+                    <th>Rôle actuel</th>
+                    <th>Statut</th>
+                </tr>
+            </thead>
+            <!-- الـ tbody هذا باش نعمروه بالـ JS -->
+            <tbody id="admin-active-users">
+            </tbody>
+        </table>
+    </div>
+</section>

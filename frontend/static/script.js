@@ -11,26 +11,48 @@ const pageTitles = {
 };
 
 function switchTab(tabId) {
-    // Cacher toutes les sections
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-    // Retirer classe active des boutons
-    document.querySelectorAll('.menu-btn').forEach(el => el.classList.remove('active'));
+    // 1. Hide all tabs
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+        tab.style.display = 'none';
+    });
     
-    // Afficher la section cible
-    document.getElementById('page-' + tabId).classList.add('active');
-    
-    // Mettre à jour le bouton actif (basé sur le onclick)
-    const activeBtn = document.querySelector(`button[onclick="switchTab('${tabId}')"]`);
-    if(activeBtn) {
-        activeBtn.classList.add('active');
-        // Déplacer le petit point rouge "active-dot"
-        const dot = document.querySelector('.active-dot');
+    // 2. Remove active class from all menu buttons
+    document.querySelectorAll('.menu-btn').forEach(btn => {
+        btn.classList.remove('active');
+        let dot = btn.querySelector('.active-dot');
         if(dot) dot.remove();
-        activeBtn.innerHTML += '<span class="active-dot"></span>';
+    });
+
+    // 3. Show selected tab (kenha mawjouda fil DOM)
+    const selectedTab = document.getElementById('page-' + tabId);
+    if (selectedTab) {
+        selectedTab.classList.add('active');
+        selectedTab.style.display = 'block';
     }
 
-    // Changer le titre en haut
-    document.getElementById('page-title').innerHTML = pageTitles[tabId];
+    // 4. Highlight clicked button (kenu mawjoud)
+    const activeBtn = document.querySelector(`.menu-btn[onclick="switchTab('${tabId}')"]`);
+    if (activeBtn) {
+        activeBtn.classList.add('active');
+        activeBtn.innerHTML += '<span class="active-dot"></span>';
+    }
+    
+    // 5. Update page title
+    const titles = {
+        'overview': '<i class="fas fa-chart-pie"></i> Executive Overview',
+        'pipeline': '<i class="fas fa-database"></i> Data Pipeline',
+        'config': '<i class="fas fa-cog"></i> LoRA & Quantization',
+        'training': '<i class="fas fa-rocket"></i> Active Training',
+        'chatbot': '<i class="fas fa-comment-dots"></i> Voice Chatbot',
+        'benchmarking': '<i class="fas fa-balance-scale"></i> Benchmarking',
+        'user-management': '<i class="fas fa-users-cog"></i> User Management'
+    };
+    
+    const pageTitle = document.getElementById('page-title');
+    if (pageTitle && titles[tabId]) {
+        pageTitle.innerHTML = titles[tabId];
+    }
 }
 
 function updatePlaceholder() {
@@ -386,3 +408,98 @@ async function handleApproval(email, action) {
     alert(result.message); // Y5arej popup feha "Compte activé"
     fetchPendingUsers(); // Ya3mel mise à jour lel liste instantanément
 }
+
+
+// Fonction باش تجيب الداتا وتعمر الجداول
+async function loadUserManagement() {
+    try {
+        const res = await fetch('/api/users');
+        const data = await res.json();
+        
+        if(data.status === 'success') {
+            const users = data.users;
+            
+            // نقسمو المستعملين حسب الـ Status
+            const pendingUsers = users.filter(u => u.status === 'pending');
+            const activeUsers = users.filter(u => u.status === 'active');
+            
+            // 1. تبديل الأرقام الفوق (Metrics)
+            document.getElementById('total-users-count').innerText = users.length;
+            document.getElementById('pending-users-count').innerText = pendingUsers.length;
+            
+            // 2. تعمير جدول الـ Demandes en attente
+            const pendingTbody = document.getElementById('admin-pending-users');
+            pendingTbody.innerHTML = ''; // نفرغو الجدول قبل ما نعمروه
+            
+            if(pendingUsers.length === 0) {
+                pendingTbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Aucune demande en attente</td></tr>';
+            } else {
+                pendingUsers.forEach(user => {
+                    pendingTbody.innerHTML += `
+                        <tr>
+                            <td><strong>${user.name}</strong><br><small style="color:gray">${user.email}</small></td>
+                            <td>${user.department}</td>
+                            <td>${user.role}</td>
+                            <td>
+                                <button onclick="updateUserStatus('${user.email}', 'active')" class="btn-primary" style="padding: 5px 10px; font-size: 12px; margin-right: 5px; cursor: pointer;">
+                                    <i class="fas fa-check"></i> Accepter
+                                </button>
+                                <button onclick="updateUserStatus('${user.email}', 'rejected')" class="btn-outline" style="padding: 5px 10px; font-size: 12px; color: #ef4444; border-color: #ef4444; cursor: pointer;">
+                                    <i class="fas fa-times"></i> Refuser
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+
+            // 3. تعمير جدول الـ Utilisateurs Actifs
+            const activeTbody = document.getElementById('admin-active-users');
+            activeTbody.innerHTML = '';
+            
+            activeUsers.forEach(user => {
+                activeTbody.innerHTML += `
+                    <tr>
+                        <td><strong>${user.name}</strong><br><small style="color:gray">${user.email}</small></td>
+                        <td>${user.department}</td>
+                        <td>${user.role}</td>
+                        <td><span style="color: #10b981; font-weight: 600;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 5px;"></i>Actif</span></td>
+                    </tr>
+                `;
+            });
+        }
+    } catch(err) {
+        console.error("Erreur lors du chargement des utilisateurs:", err);
+    }
+}
+
+// Fonction باش نقبلو أو نرفضو مستعمل
+async function updateUserStatus(email, newStatus) {
+    // كان باش نفسخوه، نعملو Confirmation صغيرة
+    if(newStatus === 'rejected' && !confirm(`Voulez-vous vraiment refuser l'accès à ${email} ?`)) {
+        return;
+    }
+
+    try {
+        const res = await fetch('/api/users/status', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email, status: newStatus })
+        });
+        
+        if(res.ok) {
+            // كي تنجح العملية، نعيطو للـ loadUserManagement باش الجدول يتعملو Refresh أوتوماتيكياً
+            loadUserManagement();
+        }
+    } catch(err) {
+        console.error("Erreur:", err);
+    }
+}
+
+// نعيطو للـ Fonction هذي أول ما تتحل الباج (أو كي ينزل الـ Admin على تبويبة User Management)
+document.addEventListener('DOMContentLoaded', () => {
+    // كان الـ Role متاعو Admin، شرجي الداتا
+    if (localStorage.getItem('userRole') === 'Administrateur' || localStorage.getItem('userRole') === 'admin') {
+        loadUserManagement();
+    }
+});

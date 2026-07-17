@@ -10,7 +10,7 @@ import soundfile as sf
 import smtplib
 from email.message import EmailMessage
 
-from fastapi import FastAPI, UploadFile, Form, File, HTTPException, Request, Header, Depends
+from fastapi import FastAPI, UploadFile, Form, File, HTTPException, Request, Header, Depends, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
@@ -97,11 +97,26 @@ tts_config = load_config("configs/tts_config.yaml")
 # ==========================================
 # 4. PYDANTIC MODELS
 # ==========================================
+class SignupModel(BaseModel):
+    email: str
+    password: str
+    role: str
+
+
 class PipelineRequest(BaseModel):
-    source: str
+    source: str 
     dataset_path: str
     output_dir: str = None
 
+# 🚨 زيد هذا هنا باش FastAPI يفهم الـ Credentials
+class LoginCredentials(BaseModel):
+    username: str = None  # نردوها اختياري
+    email: str = None     # نزيدو هذي احتياطاً خاطرها مكتوبة في الـ Form
+    password: str
+
+class UserStatusUpdate(BaseModel):
+    email: str
+    status: str
 
 # ==========================================
 # 5. DEPENDENCIES & HELPER FUNCTIONS
@@ -145,33 +160,87 @@ async def root():
 async def login_page(request: Request):
     return templates.TemplateResponse(request=request, name="login.html")
 
+
 @app.get("/dashboard")
-async def dashboard(request: Request):
-    response = templates.TemplateResponse(request=request, name="index.html")
-    # نمنعو الـ Navigateur باش يعمل Cache للـ Dashboard لدواعي أمنية
-    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
-    response.headers["Pragma"] = "no-cache"
-    response.headers["Expires"] = "0"
-    return response
+async def get_dashboard(request: Request):
+    # نقراو الـ Role من الـ Cookie
+    current_user_role = request.cookies.get("user_role", "mlops") 
+    
+    # 🚨 زيد السطرين هاذم باش يظهرولك في الـ Terminal:
+    print("====== DEBUG ROLE ======")
+    print(f"Role recu du navigateur : {current_user_role}")
+    
+    current_user_name = request.cookies.get("user_name", "Utilisateur")
+
+    return templates.TemplateResponse(
+        request=request,
+        name="index.html",
+        context={
+            "user_role": current_user_role,
+            "user_name": current_user_name
+        }
+    )
+
+
+# 2. زيد الـ Route هذا باش نجيبو بيه المستعملين الكل
+@app.get("/api/users")
+async def get_all_users():
+    users_list = []
+    for email, data in USERS_DB.items():
+        # نصنعو اسم مستعار من الايميل (مثال: ahmed.amine)
+        name = email.split('@')[0].replace('.', ' ').title()
+        
+        users_list.append({
+            "email": email,
+            "name": name,
+            "role": data["role"],
+            "status": data.get("status", "pending"), # كان مفماش status نعتبروه pending
+            "department": "IT / Data" # نجمو نبدلوها مبعد كان تحب تزيد ديبارتمان
+        })
+    return {"status": "success", "users": users_list}
+
+@app.put("/api/users/status")
+async def update_user_status(update_data: UserStatusUpdate):
+    email = update_data.email
+    if email in USERS_DB:
+        if update_data.status == "rejected":
+            # كان ترفض، نفسخوه من الـ DB (أو تبدلو الـ status متاعو لـ rejected)
+            del USERS_DB[email]
+        else:
+            # كان تقبل، يولي active
+            USERS_DB[email]["status"] = "active"
+        return {"status": "success", "message": "Statut mis à jour avec succès"}
+    
+    raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+
+@app.get("/logout")
+async def logout(response: Response):
+    response.delete_cookie("user_role")
+    response.delete_cookie("user_name")
+    # وتعمل redirect لصفحة الـ login
+    return RedirectResponse(url="/login", status_code=307)
 
 
 # ==========================================
 # 7. AUTHENTICATION & USER MANAGEMENT API
 # ==========================================
 @app.post("/api/signup")
-async def signup(
-    email: str = Form(...),
-    password: str = Form(...),
-    role: str = Form(...)
-):
-    if email in USERS_DB:
-        return JSONResponse(status_code=400, content={"message": "Email existe déjà!"})
+async def signup(new_user: SignupModel):
+    user_email = new_user.email
     
-    USERS_DB[email] = {
-        "password": password,
-        "role": role,
-        "status": "pending"
+    # 1. نثبتو كان المستعمل مسجل من قبل
+    if user_email in USERS_DB:
+        raise HTTPException(status_code=400, detail="Cet email est déjà utilisé")
+        
+    # 2. نزيدوه للـ Base de données بصفة "pending" (باش يخرج للـ Admin في جدول الانتظار)
+    USERS_DB[user_email] = {
+        "password": new_user.password,
+        "role": new_user.role,
+        "status": "pending"  # 🚨 هذي أهم حاجة باش يدخل لجدول Demandes en attente
     }
+    
+    # 3. نرجعو رسالة نجاح
+    return {"status": "success", "message": "Votre demande a été envoyée avec succès. En attente de validation."}
     
     # 💥 السطر هذا ضروري باش يسجل في الفيشيي
     save_db(USERS_DB) 
@@ -181,17 +250,38 @@ async def signup(
 
 
 @app.post("/api/login")
-async def login_api(email: str = Form(...), password: str = Form(...)):
-    user = USERS_DB.get(email)
-    
-    if not user or user["password"] != password:
-        return JSONResponse(status_code=401, content={"message": "Email ou mot de passe incorrect."})
-    
-    if user["status"] == "pending":
-        return JSONResponse(status_code=403, content={"message": "Votre compte est en attente d'approbation."})
-        
-    return JSONResponse(content={"email": email, "role": user["role"], "message": "Login successful"})
+async def login(credentials: LoginCredentials, response: Response):
+    # ياخذ الـ email سواء تبعث في الـ payload كـ username أو كـ email
+    user_email = credentials.email or credentials.username
+    user_password = credentials.password
 
+    if not user_email:
+        raise HTTPException(status_code=400, detail="Email ou username manquant")
+
+    # 1. التثبت من قاعدة البيانات JSON
+    if user_email in USERS_DB and USERS_DB[user_email]["password"] == user_password:
+        db_user = USERS_DB[user_email]
+        db_role = db_user["role"]  # "Administrateur" أو "MLOps Engineer"
+        
+        # 2. تحويل الـ Role للي يستحقو الـ Jinja والـ JS
+        if db_role == "Administrateur":
+            jinja_role = "admin"
+            name = "Directeur AI"
+            js_role = "Administrateur"
+        else:
+            jinja_role = "mlops"
+            name = "Ahmed Amine Salah"
+            js_role = "MLOps Engineer"
+
+        # 3. تسجيل الـ Cookies للـ Jinja
+        response.set_cookie(key="user_role", value=jinja_role, httponly=True)
+        response.set_cookie(key="user_name", value=name, httponly=True)
+
+        return {"status": "success", "role": js_role}
+    
+    else:
+        # رجعنا "detail" عوض "message" باش تتماشى مع FastAPI
+        raise HTTPException(status_code=401, detail="Email ou mot de passe incorrect")
 
 # ==========================================
 # 8. ADMIN APPROVAL PANEL API
