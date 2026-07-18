@@ -8,7 +8,6 @@ import json
 import os
 import soundfile as sf
 import smtplib
-from email.message import EmailMessage
 
 from fastapi import FastAPI, UploadFile, Form, File, HTTPException, Request, Header, Depends, Response
 from fastapi.staticfiles import StaticFiles
@@ -53,10 +52,15 @@ templates = Jinja2Templates(directory="frontend/templates")
 # ==========================================
 # 2. DATABASE (JSON FILE) & GLOBAL STATES
 # ==========================================
-DB_FILE = "users_db.json"
+# 🚨 1. نحددو البلاصة الصحيحة (Chemin absolu) باش الفيشيي يتسجل ديما بحذا الكود
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_FILE = os.path.join(BASE_DIR, "users_db.json")
 
 def load_db():
     """تقرا اليوزرات من ملف الـ JSON، كان مفماش تصنع واحد فيه الـ Admin"""
+    # نطبعو المسار باش نشوفوه بعينينا في الـ Console
+    print(f"📂 Chemin de la Base de données : {DB_FILE}") 
+    
     if os.path.exists(DB_FILE):
         with open(DB_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
@@ -101,6 +105,9 @@ class SignupModel(BaseModel):
     email: str
     password: str
     role: str
+    username: str
+    department: str       
+    sub_department: str
 
 
 class PipelineRequest(BaseModel):
@@ -117,6 +124,13 @@ class LoginCredentials(BaseModel):
 class UserStatusUpdate(BaseModel):
     email: str
     status: str
+
+class UserEditModel(BaseModel):
+    email: str
+    new_role: str
+
+class UserDeleteModel(BaseModel):
+    email: str
 
 # ==========================================
 # 5. DEPENDENCIES & HELPER FUNCTIONS
@@ -139,14 +153,6 @@ def audio_to_base64(audio_array, sampling_rate) -> str:
     sf.write(buffer, audio_array, sampling_rate, format="WAV")
     return base64.b64encode(buffer.getvalue()).decode("utf-8")
 
-
-def send_approval_email(user_email: str):
-    """إرسال إيميل تفعيل الحساب"""
-    print("🚀 ------------------------------------------------")
-    print(f"📧 EMAIL SENT TO: {user_email}")
-    print("Subject: Compte Ooredoo AI Framework Activé")
-    print("Body: Bonjour, votre compte a été approuvé par l'Administrateur.")
-    print("🚀 ------------------------------------------------")
 
 
 # ==========================================
@@ -187,29 +193,80 @@ async def get_dashboard(request: Request):
 async def get_all_users():
     users_list = []
     for email, data in USERS_DB.items():
-        # نصنعو اسم مستعار من الايميل (مثال: ahmed.amine)
-        name = email.split('@')[0].replace('.', ' ').title()
+       
+        name = data.get("username", email.split('@')[0].capitalize())
+        dept = data.get("department", "IT")
+        sub_dept = data.get("sub_department", "Data")
         
         users_list.append({
             "email": email,
             "name": name,
             "role": data["role"],
-            "status": data.get("status", "pending"), # كان مفماش status نعتبروه pending
-            "department": "IT / Data" # نجمو نبدلوها مبعد كان تحب تزيد ديبارتمان
+            "status": data.get("status", "pending"),
+            "department": f"{dept} / {sub_dept}" 
         })
     return {"status": "success", "users": users_list}
 
 @app.put("/api/users/status")
 async def update_user_status(update_data: UserStatusUpdate):
-    email = update_data.email
+    email = update_data.email.strip().lower() # 🚨 ديما نظف الايميل
+    
     if email in USERS_DB:
         if update_data.status == "rejected":
-            # كان ترفض، نفسخوه من الـ DB (أو تبدلو الـ status متاعو لـ rejected)
+            # كان ترفض، نفسخوه من الـ DB
             del USERS_DB[email]
         else:
             # كان تقبل، يولي active
             USERS_DB[email]["status"] = "active"
+        
+        # 💥 🚨 هذي هي السطر السحري اللي ناقصك: لازم تسجل التغيير في الفيشيي
+        save_db(USERS_DB) 
+        
         return {"status": "success", "message": "Statut mis à jour avec succès"}
+    
+    raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+
+@app.put("/api/users/edit")
+async def edit_user(user_edit: UserEditModel):
+    # 🚨 1. تنظيف الايميل
+    clean_email = user_edit.email.strip().lower() 
+    
+    if clean_email in USERS_DB:
+        # 2. تبديل الـ Role
+        USERS_DB[clean_email]["role"] = user_edit.new_role
+        
+        # 💥 3. التسجيل في الفيشيي
+        save_db(USERS_DB) 
+        
+        return {"status": "success", "message": "Rôle mis à jour avec succès"}
+    
+    raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+
+# 🚨 1. هذي لازمها تكون من الفوق (خاطر الرابط متاعها ثابت)
+@app.delete("/api/users/delete")
+async def delete_user_by_body(user_del: UserDeleteModel):
+    target_email = user_del.email.strip().lower()
+    print(f"\n---> 🔍 On cherche à supprimer : '{target_email}'")
+    
+    if target_email in USERS_DB:
+        del USERS_DB[target_email]
+        save_db(USERS_DB) # 💥 التسجيل في الفيشيي
+        print(f"---> ✅ Utilisateur '{target_email}' supprimé avec succès !\n")
+        return {"status": "success", "message": "Utilisateur supprimé"}
+            
+    print(f"---> ❌ Erreur : '{target_email}' n'existe pas !")
+    raise HTTPException(status_code=404, detail="Utilisateur non trouvé") 
+
+
+# 🚨 2. وهذي لازمها تكون تحتها (خاطر فاها {email} متغيرة)
+@app.delete("/api/users/{email}")
+async def delete_user_by_url(email: str):  
+    clean_email = email.strip().lower()
+    
+    if clean_email in USERS_DB:
+        del USERS_DB[clean_email]
+        save_db(USERS_DB) # 💥 التسجيل في الفيشيي
+        return {"status": "success", "message": "Utilisateur supprimé avec succès"}
     
     raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
 
@@ -226,61 +283,75 @@ async def logout(response: Response):
 # ==========================================
 @app.post("/api/signup")
 async def signup(new_user: SignupModel):
-    user_email = new_user.email
+    user_email = new_user.email.strip().lower() 
     
-    # 1. نثبتو كان المستعمل مسجل من قبل
     if user_email in USERS_DB:
         raise HTTPException(status_code=400, detail="Cet email est déjà utilisé")
         
-    # 2. نزيدوه للـ Base de données بصفة "pending" (باش يخرج للـ Admin في جدول الانتظار)
     USERS_DB[user_email] = {
+        "username": new_user.username,               # 🚨 تسجيل الاسم
+        "department": new_user.department,           # 🚨 تسجيل القسم
+        "sub_department": new_user.sub_department,   # 🚨 تسجيل القسم الفرعي
         "password": new_user.password,
         "role": new_user.role,
-        "status": "pending"  # 🚨 هذي أهم حاجة باش يدخل لجدول Demandes en attente
+        "status": "pending" 
     }
     
-    # 3. نرجعو رسالة نجاح
-    return {"status": "success", "message": "Votre demande a été envoyée avec succès. En attente de validation."}
+    save_db(USERS_DB) # تسجيل في الفيشيي JSON
     
-    # 💥 السطر هذا ضروري باش يسجل في الفيشيي
-    save_db(USERS_DB) 
+    logger.info(f"🆕 Nouvelle demande : {user_email} ({new_user.role})")
     
-    logger.info(f"🆕 Nouvelle demande de compte : {email} ({role})")
-    return JSONResponse(content={"message": "Demande envoyée avec succès à l'Administrateur."})
+    return JSONResponse(content={
+        "status": "success", 
+        "message": "Votre demande a été envoyée avec succès. En attente de validation."
+    })
 
 
 @app.post("/api/login")
 async def login(credentials: LoginCredentials, response: Response):
-    # ياخذ الـ email سواء تبعث في الـ payload كـ username أو كـ email
-    user_email = credentials.email or credentials.username
+    # 🚨 1. نظفو الايميل ملي يدخل باش يتطابق مع الداتا
+    raw_email = credentials.email or credentials.username
+    if not raw_email:
+        raise HTTPException(status_code=400, detail="Email ou username manquant")
+        
+    user_email = raw_email.strip().lower()
     user_password = credentials.password
 
-    if not user_email:
-        raise HTTPException(status_code=400, detail="Email ou username manquant")
-
-    # 1. التثبت من قاعدة البيانات JSON
     if user_email in USERS_DB and USERS_DB[user_email]["password"] == user_password:
         db_user = USERS_DB[user_email]
-        db_role = db_user["role"]  # "Administrateur" أو "MLOps Engineer"
         
-        # 2. تحويل الـ Role للي يستحقو الـ Jinja والـ JS
+        # 🚨 2. نمنعوه من الدخول كانو مازال pending
+        if db_user.get("status") == "pending":
+            raise HTTPException(status_code=403, detail="Votre compte est en attente de validation par l'Administrateur.")
+            
+        db_role = db_user["role"] 
+        
+        # 🚨 3. نجبدو البيانات الحقيقية من الـ JSON مباشرة
+        # حطينا فالباك (Fallback) باش كان فما يوزر قديم ماعندوش اسم، ما يتبلوش السيرفور
+        name = db_user.get("username", user_email.split('@')[0].capitalize())
+        dept = db_user.get("department", "IT")
+        sub_dept = db_user.get("sub_department", "Data")
+
         if db_role == "Administrateur":
             jinja_role = "admin"
-            name = "Directeur AI"
             js_role = "Administrateur"
         else:
             jinja_role = "mlops"
-            name = "Ahmed Amine Salah"
             js_role = "MLOps Engineer"
 
-        # 3. تسجيل الـ Cookies للـ Jinja
         response.set_cookie(key="user_role", value=jinja_role, httponly=True)
         response.set_cookie(key="user_name", value=name, httponly=True)
 
-        return {"status": "success", "role": js_role}
+        # 🚨 4. نبعثو البيانات الجديدة (الاسم والقسم) للـ Frontend باش يسجلها في الـ localStorage
+        return {
+            "status": "success", 
+            "role": js_role,
+            "username": name,
+            "department": dept,
+            "sub_department": sub_dept
+        }
     
     else:
-        # رجعنا "detail" عوض "message" باش تتماشى مع FastAPI
         raise HTTPException(status_code=401, detail="Email ou mot de passe incorrect")
 
 # ==========================================
@@ -302,19 +373,22 @@ async def approve_user(
     action: str = Form(...), 
     admin_email: str = Depends(verify_admin)
 ):
-    if email not in USERS_DB:
+    # 🚨 4. نظفو الايميل باش يلقاه بالصحيح في الـ USERS_DB
+    clean_email = email.strip().lower()
+    
+    if clean_email not in USERS_DB:
         raise HTTPException(status_code=404, detail="Utilisateur introuvable.")
     
     if action == "accept":
-        USERS_DB[email]["status"] = "active"
+        USERS_DB[clean_email]["status"] = "active"
         save_db(USERS_DB) # 💥 تسجيل
-        send_approval_email(email)
-        return {"message": f"✅ Compte {email} activé avec succès!"}
+        # send_approval_email(clean_email) # نحاها كان ما عندكش الفونكسيون هذي توة باش ما تعملكش Erreur
+        return {"message": f"✅ Compte {clean_email} activé avec succès!"}
         
     elif action == "reject":
-        del USERS_DB[email]
+        del USERS_DB[clean_email]
         save_db(USERS_DB) # 💥 تسجيل
-        return {"message": f"❌ Demande {email} refusée et supprimée."}
+        return {"message": f"❌ Demande {clean_email} refusée et supprimée."}
 
 
 # ==========================================

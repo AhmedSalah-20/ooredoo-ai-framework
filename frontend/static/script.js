@@ -328,8 +328,41 @@ document.addEventListener("DOMContentLoaded", () => {
 
     console.log("Bienvenue ! Role actuel :", userRole);
     
+    // ==========================================
+    // 🚨 التغييرات الجديدة: قراءة الداتا وتعمير الـ Dashboard
+    // ==========================================
+    const userName = localStorage.getItem("userName"); 
+    const userDept = localStorage.getItem("userDept");
+    const userSubDept = localStorage.getItem("userSubDept");
+
+    // تبديل الاسم والحروف (Avatar)
+    if(userName) {
+        const sidebarName = document.getElementById("sidebar-name");
+        if(sidebarName) sidebarName.innerText = userName;
+        
+        // ناخذو أول زوز حروف ونردوهم Majuscule
+        const initials = userName.substring(0, 2).toUpperCase();
+        
+        const sidebarAvatar = document.getElementById("sidebar-avatar");
+        const navAvatar = document.getElementById("nav-avatar");
+        
+        if(sidebarAvatar) sidebarAvatar.innerText = initials;
+        if(navAvatar) navAvatar.innerText = initials;
+    }
+
+    // تبديل الـ Role والقسم
+    if(userRole && userDept) {
+        let roleText = `${userRole} · ${userDept}`;
+        if(userSubDept && userSubDept.trim() !== "") {
+            roleText += ` (${userSubDept})`;
+        }
+        const sidebarRole = document.getElementById("sidebar-role");
+        if(sidebarRole) sidebarRole.innerText = roleText;
+    }
+    // ==========================================
+    
     // كان السيد مدير، نظهرو الـ panel ونجيبو الـ data
-    if (userRole === "Administrateur") {
+    if (userRole === "Administrateur" || userRole === "admin") {
         const panel = document.getElementById('admin-approval-panel');
         if (panel) {
             panel.style.display = 'block';
@@ -348,6 +381,11 @@ function logout() {
     // Fassa5 les données mel navigateur
     localStorage.removeItem("userRole");
     localStorage.removeItem("userEmail");
+    // 🚨 زدنا فسخنا الداتا الجديدة
+    localStorage.removeItem("userName");
+    localStorage.removeItem("userDept");
+    localStorage.removeItem("userSubDept");
+    
     // Raja3 l'utilisateur lel page login
     window.location.replace("/login");
 }
@@ -458,15 +496,25 @@ async function loadUserManagement() {
             activeTbody.innerHTML = '';
             
             activeUsers.forEach(user => {
-                activeTbody.innerHTML += `
-                    <tr>
-                        <td><strong>${user.name}</strong><br><small style="color:gray">${user.email}</small></td>
-                        <td>${user.department}</td>
-                        <td>${user.role}</td>
-                        <td><span style="color: #10b981; font-weight: 600;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 5px;"></i>Actif</span></td>
-                    </tr>
-                `;
-            });
+    activeTbody.innerHTML += `
+        <tr>
+            <td><strong>${user.name}</strong><br><small style="color:gray">${user.email}</small></td>
+            <td>${user.department}</td>
+            <td>${user.role}</td>
+            <td><span style="color: #10b981; font-weight: 600;"><i class="fas fa-circle" style="font-size: 8px; margin-right: 5px;"></i>Actif</span></td>
+            <td>
+                <!-- بطونة التبديل -->
+                <button onclick="editUserRole('${user.email}', '${user.role}')" class="btn-outline" style="padding: 5px 10px; font-size: 12px; color: #3b82f6; border-color: #3b82f6; cursor: pointer; margin-right: 5px;">
+                    <i class="fas fa-edit"></i> Modifier
+                </button>
+                <!-- بطونة الفسخان -->
+                <button onclick="deleteUserRecord('${user.email}')" class="btn-outline" style="padding: 5px 10px; font-size: 12px; color: #ef4444; border-color: #ef4444; cursor: pointer;">
+                    <i class="fas fa-trash"></i> Supprimer
+                </button>
+            </td>
+        </tr>
+    `;
+});
         }
     } catch(err) {
         console.error("Erreur lors du chargement des utilisateurs:", err);
@@ -503,3 +551,104 @@ document.addEventListener('DOMContentLoaded', () => {
         loadUserManagement();
     }
 });
+
+// Fonction متاع التبديل (Modification du Rôle) avec Liste Déroulante
+async function editUserRole(email, currentRole) {
+    // 1. نخرجو Popup SweetAlert فيها Select 
+    const { value: newRole } = await Swal.fire({
+        title: 'Modifier le rôle',
+        html: `Sélectionnez le nouveau rôle pour <br><b>${email}</b> :`,
+        input: 'select',
+        inputOptions: {
+            'Administrateur': 'Administrateur',
+            'MLOps Engineer': 'MLOps Engineer'
+        },
+        inputValue: currentRole, // باش يحطلو الـ Role الحالي par défaut
+        showCancelButton: true,
+        confirmButtonText: '<i class="fas fa-save"></i> Enregistrer',
+        cancelButtonText: 'Annuler',
+        confirmButtonColor: '#ED1C24', // لون الفلسة يمشي مع الـ Ooredoo Theme
+    });
+    
+    // 2. كان نزل Annuler ولا ما بدل شيء، نقصو العملية
+    if (!newRole || newRole === currentRole) {
+        return;
+    }
+
+    // 3. نبعثو الـ Rôle الجديد للـ Backend
+    try {
+        const res = await fetch('/api/users/edit', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email, new_role: newRole })
+        });
+        
+        if (res.ok) {
+            // ميساج مزيان يقولو راهي تبدلت بنجاح
+            Swal.fire({
+                title: 'Succès!',
+                text: 'Le rôle a été mis à jour avec succès.',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+            });
+            // نرفرشيو الجدول باش يظهر التغيير
+            loadUserManagement();
+        } else {
+            Swal.fire('Erreur', 'Erreur lors de la modification depuis le serveur.', 'error');
+        }
+    } catch(err) {
+        console.error("Erreur:", err);
+        Swal.fire('Erreur', 'Problème de connexion avec le serveur.', 'error');
+    }
+}
+
+
+// Fonction متاع الفسخان (Suppression d'un utilisateur) avec SweetAlert2
+async function deleteUserRecord(email) {
+    // 1. عوضنا الـ confirm() بـ Popup SweetAlert2 مزيانة
+    const result = await Swal.fire({
+        title: 'Êtes-vous sûr ?',
+        html: `Voulez-vous vraiment supprimer l'utilisateur <br><b>${email}</b> définitivement ?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ED1C24', // لون Ooredoo
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: '<i class="fas fa-trash"></i> Oui, supprimer',
+        cancelButtonText: 'Annuler',
+        reverseButtons: true
+    });
+
+    // 2. كان المستعمل نزل "Oui, supprimer"
+    if (result.isConfirmed) {
+        try {
+            // 3. خلينا الـ fetch "المصححة" متاعك كيما هي بالضبط
+            const res = await fetch('/api/users/delete', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email }) // بعثنا الداتا كـ JSON
+            });
+            
+            if (res.ok) {
+                // ميساج نجاح مزيان في بلاصة ما يصير شي
+                Swal.fire({
+                    title: 'Supprimé !',
+                    text: 'L\'utilisateur a été supprimé avec succès.',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                loadUserManagement(); // تحديث الجدول
+            } else {
+                const data = await res.json();
+                // عوضنا الـ alert() القديمة بـ Erreur SweetAlert
+                Swal.fire('Erreur', data.detail || data.message || "Erreur lors de la suppression", 'error');
+            }
+        } catch(err) {
+            console.error("Erreur:", err);
+            // عوضنا الـ alert() متع الكونكسيون زادة
+            Swal.fire('Erreur', 'Erreur de connexion au serveur', 'error');
+        }
+    }
+}
+

@@ -19,8 +19,20 @@ body { background-color: var(--bg-main); color: var(--text-main); height: 100vh;
 
 /* SIDEBAR */
 .sidebar { width: 260px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; justify-content: space-between; }
-.sidebar-header { padding: 20px; display: flex; align-items: center; gap: 10px; }
-.ooredoo-logo { height: 35px; }
+.sidebar-header { 
+    padding: 30px 20px 20px; /* زدنا مساحة الفوق باش اللوجو يتنفس وما يبداش لاصق في الحافة */
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+}
+.ooredoo-logo { 
+    height: 50px; /* كبرنا اللوجو باش يشد بلاصتو */
+    object-fit: contain; /* باش التصويرة تحافظ على الـ proportions متاعها وما تتمططش */
+    transition: transform 0.3s ease; /* زدناها أنيماسيون خفيفة */
+}
+.ooredoo-logo:hover {
+    transform: scale(1.05);
+}
 .tagline { font-size: 12px; font-weight: 700; color: var(--primary); letter-spacing: 0.5px; }
 .framework-badge { margin: 0 20px 20px; background: #FEF2F2; color: var(--primary); font-size: 12px; font-weight: 600; padding: 10px; border-radius: 8px; border: 1px solid #FECACA; text-align: center; }
 
@@ -30,7 +42,21 @@ body { background-color: var(--bg-main); color: var(--text-main); height: 100vh;
 .menu-btn i { width: 16px; text-align: center; font-size: 16px; }
 .menu-btn:hover { background: #F8FAFC; color: var(--text-main); }
 .menu-btn.active { background: #FEF2F2; color: var(--primary); font-weight: 600; }
-.active-dot { position: absolute; right: 15px; width: 6px; height: 6px; background: var(--primary); border-radius: 50%; }
+.active-dot { 
+    position: absolute; 
+    right: 15px; 
+    width: 6px; 
+    height: 6px; 
+    background: var(--primary); 
+    border-radius: 50%; 
+    box-shadow: 0 0 0 0 rgba(237, 28, 36, 0.4);
+    animation: pulse-dot 2s infinite; /* 🌟 أنيماسيون النبض */
+}
+@keyframes pulse-dot {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(237, 28, 36, 0.4); }
+    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(237, 28, 36, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(237, 28, 36, 0); }
+}
 
 .user-profile { padding: 20px; border-top: 1px solid var(--border); }
 .user-profile { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center; }
@@ -44,7 +70,18 @@ body { background-color: var(--bg-main); color: var(--text-main); height: 100vh;
 
 /* MAIN CONTENT */
 .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-.top-nav { height: 70px; background: #FFFFFF; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; padding: 0 40px; }
+.top-nav { 
+    height: 70px; 
+    background: #FFFFFF; 
+    border-bottom: 1px solid var(--border); 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 0 40px; 
+    box-shadow: 0 4px 20px -10px rgba(0,0,0,0.05); /* 🌟 هذه الزيادة */
+    z-index: 10; /* باش الخيال يجي فوق الكونتوني */
+    position: relative;
+}
 .top-nav h2 { font-size: 20px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
 .top-controls { display: flex; align-items: center; gap: 20px; }
 .model-selector { padding: 8px 16px; border: 1px solid var(--border); border-radius: 20px; font-size: 14px; outline: none; background: #F8FAFC; cursor: pointer; }

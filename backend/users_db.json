@@ -1,0 +1,18 @@
+{
+    "ahmedaminsaleh9@gmail.com": {
+        "username": "ahmedsalah",
+        "department": "IT",
+        "sub_department": "AI",
+        "password": "asas290920",
+        "role": "Administrateur",
+        "status": "active"
+    },
+    "ranimebarbouchi@gmail.com": {
+        "username": "ranime barbouchi",
+        "department": "IT",
+        "sub_department": "AI",
+        "password": "asas290920",
+        "role": "MLOps Engineer",
+        "status": "active"
+    }
+}

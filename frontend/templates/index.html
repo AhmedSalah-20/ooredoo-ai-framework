@@ -49,20 +49,11 @@
 
             <!-- USER PROFILE FOOTER -->
             <div class="user-profile">
-                <div class="avatar">{{ user_name[:2] | upper }}</div>
+                <div class="avatar" id="sidebar-avatar">{{ user_name[:2] | upper }}</div>
                 <div class="user-info">
-                    <h4>{{ user_name }}</h4>
-                    {% if user_role == 'mlops' %}
-            <p>ML Engineer · Ooredoo TN</p>
-        
-        <!-- كان مكونكتي Admin -->
-        {% elif user_role == 'admin' %}
-            <p>Directeur AI · Ooredoo TN</p>
-            
-        <!-- أي دور آخر -->
-        {% else %}
-            <p>{{ user_title }}</p>
-        {% endif %}
+                    <h4 id="sidebar-name">{{ user_name }}</h4>
+                   
+                        <p id="sidebar-role">Chargement...</p>
                 </div>
             </div>
         </aside>
@@ -78,7 +69,7 @@
                         <option>ooredoo-stt-whisper</option>
                         <option>ooredoo-tts-vits</option>
                     </select>
-                    <div class="avatar small">{{ user_name[:2] | upper }}</div>
+                    <div class="avatar small" id="nav-avatar">{{ user_name[:2] | upper }}</div>
                     <button onclick="logout()" class="logout-nav-btn" title="Déconnexion">
                         <i class="fas fa-sign-out-alt"></i> <span>Quitter</span>
                     </button>
@@ -107,5 +98,6 @@
     </div>
 
     <script src="/static/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html>

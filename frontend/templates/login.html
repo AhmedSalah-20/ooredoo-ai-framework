@@ -7,32 +7,115 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --ooredoo-red: #ED1C24; --bg-color: #f8fafc; --text-main: #1e293b; }
+        :root { 
+            --ooredoo-red: #ED1C24; 
+            --ooredoo-red-hover: #D11820;
+            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); 
+            --text-main: #0f172a; 
+            --text-muted: #64748b;
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background-color: var(--bg-color); display: flex; align-items: center; justify-content: center; height: 100vh; }
-        .auth-container { background: white; width: 100%; max-width: 420px; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-        .logo-section { text-align: center; margin-bottom: 30px; }
-        .logo-section i { font-size: 40px; color: var(--ooredoo-red); }
+        
+        body { 
+            background: var(--bg-gradient); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
+            padding: 20px;
+        }
+        
+        /* 🌟 تحديث الـ Box باش يولي Modern أكثر */
+        .auth-container { 
+            background: white; 
+            width: 100%; 
+            max-width: 450px; 
+            padding: 45px 40px; 
+            border-radius: 16px; 
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+        
+        /* 🌟 تحديث قسم اللوجو */
+        .logo-section { text-align: center; margin-bottom: 35px; }
+        .logo-section img { height: 45px; margin-bottom: 15px; object-fit: contain; }
+        .logo-section h2 { color: var(--text-main); font-weight: 700; font-size: 24px; letter-spacing: -0.5px; }
+        .logo-section p { color: var(--text-muted); font-size: 14px; margin-top: 5px; }
+        
+        /* 🌟 تحديث الـ Inputs */
         .input-group { margin-bottom: 20px; }
-        .input-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 13px; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; }
         .input-wrapper { position: relative; }
-        .input-wrapper i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
-        .input-wrapper input, .input-wrapper select { width: 100%; padding: 12px 12px 12px 40px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; }
-        .btn { width: 100%; background: var(--ooredoo-red); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; }
-        .switch-text { text-align: center; margin-top: 15px; font-size: 14px; cursor: pointer; color: var(--ooredoo-red); }
-        .alert { padding: 10px; border-radius: 6px; margin-bottom: 15px; display: none; text-align: center; font-size: 14px; }
-        .alert-error { background: #fef2f2; color: #b91c1c; }
-        .alert-success { background: #f0fdf4; color: #15803d; }
+        .input-wrapper i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #94a3b8; transition: all 0.3s ease; }
+        
+        .input-wrapper input, .input-wrapper select { 
+            width: 100%; 
+            padding: 14px 14px 14px 45px; 
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1; 
+            border-radius: 10px; 
+            outline: none; 
+            font-size: 14px;
+            color: var(--text-main);
+            transition: all 0.3s ease; 
+        }
+        
+        /* 🌟 الـ Focus Effect (كي تنزل على الخانة) */
+        .input-wrapper input:focus, .input-wrapper select:focus {
+            background-color: #ffffff;
+            border-color: var(--ooredoo-red);
+            box-shadow: 0 0 0 4px rgba(237, 28, 36, 0.1);
+        }
+        .input-wrapper:focus-within i { color: var(--ooredoo-red); }
+        
+        /* 🌟 تحديث الـ Bouton */
+        .btn { 
+            width: 100%; 
+            background: var(--ooredoo-red); 
+            color: white; 
+            border: none; 
+            padding: 14px; 
+            border-radius: 10px; 
+            font-weight: 600; 
+            font-size: 15px;
+            cursor: pointer; 
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(237, 28, 36, 0.2);
+            margin-top: 10px;
+        }
+        .btn:hover { 
+            background: var(--ooredoo-red-hover); 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px -1px rgba(237, 28, 36, 0.3);
+        }
+        
+        /* 🌟 تحديث الـ Lien اللوطاني */
+        .switch-text { 
+            text-align: center; 
+            margin-top: 20px; 
+            font-size: 14px; 
+            font-weight: 500;
+            cursor: pointer; 
+            color: var(--text-muted); 
+            transition: color 0.3s ease;
+        }
+        .switch-text span { color: var(--ooredoo-red); font-weight: 600; }
+        .switch-text:hover span { color: var(--ooredoo-red-hover); text-decoration: underline; }
+        
+        .alert { padding: 12px; border-radius: 8px; margin-bottom: 20px; display: none; text-align: center; font-size: 14px; font-weight: 500; }
+        .alert-error { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+        .alert-success { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
     </style>
 </head>
 <body>
 
 <div class="auth-container">
     <div class="logo-section">
-        <i class="fas fa-network-wired"></i>
+        <!-- عوضنا الأيقونة باللوجو الحقيقي -->
+        <img src="/static/logo-ooredoo.png" alt="Ooredoo" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Ooredoo_logo.svg/512px-Ooredoo_logo.svg.png'">
         <h2 id="form-title">Connexion</h2>
+        <p id="form-subtitle">Accédez à votre espace AI Enterprise</p>
     </div>
-
     <div id="alert-box" class="alert"></div>
 
     <!-- LOGIN FORM -->
@@ -46,15 +129,35 @@
             <div class="input-wrapper"><i class="fas fa-lock"></i><input type="password" id="log-pass" required></div>
         </div>
         <button type="submit" class="btn">Sign In</button>
-        <div class="switch-text" onclick="toggleForm('signup')">Créer un compte (Demande d'accès)</div>
+        <div class="switch-text" onclick="toggleForm('signup')">Nouveau sur la plateforme ? <span>Demander un accès</span></div>
     </form>
 
     <!-- SIGNUP FORM -->
     <form id="signup-form" style="display: none;">
+        
+        <!-- 🆕 خانة الاسم -->
+        <div class="input-group">
+            <label>Nom d'utilisateur</label>
+            <div class="input-wrapper"><i class="fas fa-user"></i><input type="text" id="sign-username" required></div>
+        </div>
+
         <div class="input-group">
             <label>Email Ooredoo</label>
             <div class="input-wrapper"><i class="fas fa-envelope"></i><input type="email" id="sign-email" required></div>
         </div>
+
+        <!-- 🆕 خانات القسم والقسم الفرعي بجنب بعضهم -->
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <div class="input-group" style="margin-bottom: 0; flex: 1;">
+                <label>Département</label>
+                <div class="input-wrapper"><i class="fas fa-building"></i><input type="text" id="sign-department" placeholder="ex: IT" required></div>
+            </div>
+            <div class="input-group" style="margin-bottom: 0; flex: 1;">
+                <label>Sous-dépt</label>
+                <div class="input-wrapper"><i class="fas fa-code-branch"></i><input type="text" id="sign-subdepartment" placeholder="ex: AI" required></div>
+            </div>
+        </div>
+
         <div class="input-group">
             <label>Rôle souhaité</label>
             <div class="input-wrapper">
@@ -65,18 +168,29 @@
                 </select>
             </div>
         </div>
+        
+        <!-- 👁️ خانة المودپاس مع العين -->
         <div class="input-group">
             <label>Mot de passe</label>
-            <div class="input-wrapper"><i class="fas fa-lock"></i><input type="password" id="sign-pass" required></div>
+            <div class="input-wrapper">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="sign-pass" required style="padding-right: 40px;">
+                <i class="fas fa-eye" onclick="togglePassword('sign-pass', this)" style="left: auto; right: 14px; cursor: pointer;"></i>
+            </div>
         </div>
-        <!-- زدنا خانة تأكيد كلمة السر هنا 👇 -->
+        
+        <!-- 👁️ خانة تأكيد المودپاس مع العين -->
         <div class="input-group">
             <label>Confirmer le mot de passe</label>
-            <div class="input-wrapper"><i class="fas fa-check-circle"></i><input type="password" id="sign-pass-confirm" required></div>
+            <div class="input-wrapper">
+                <i class="fas fa-check-circle"></i>
+                <input type="password" id="sign-pass-confirm" required style="padding-right: 40px;">
+                <i class="fas fa-eye" onclick="togglePassword('sign-pass-confirm', this)" style="left: auto; right: 14px; cursor: pointer;"></i>
+            </div>
         </div>
 
         <button type="submit" class="btn">Soumettre la demande</button>
-        <div class="switch-text" onclick="toggleForm('login')">Déjà un compte ? Se connecter</div>
+        <div class="switch-text" onclick="toggleForm('login')">Vous avez déjà un compte ? <span>Se connecter</span></div>
     </form>
 </div>
 
@@ -100,49 +214,76 @@
         box.className = isSuccess ? 'alert alert-success' : 'alert alert-error';
         box.style.display = 'block';
     }
+    // ==========================================
+    // 👁️ Fonction متاع إظهار/إخفاء كلمة السر
+    // ==========================================
+    function togglePassword(inputId, icon) {
+        const input = document.getElementById(inputId);
+        if (input.type === "password") {
+            input.type = "text"; 
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash"); 
+        } else {
+            input.type = "password"; 
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye"); 
+        }
+    }
 
     // ==========================================
     // 1. Submission متاع الـ Sign Up
     // ==========================================
     document.getElementById('signup-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const email = document.getElementById('sign-email').value;
-    const role = document.getElementById('sign-role').value;
-    const password = document.getElementById('sign-pass').value;
-    const confirmPassword = document.getElementById('sign-pass-confirm').value;
-
-    if (password !== confirmPassword) {
-        showAlert("Les mots de passe ne correspondent pas!", false);
-        return;
-    }
-
-    try {
-        const res = await fetch('/api/signup', { 
-            method: 'POST', 
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: email, password: password, role: role })
-        });
+        e.preventDefault();
         
-        const result = await res.json();
+        // لم الداتا القديمة
+        const email = document.getElementById('sign-email').value;
+        const role = document.getElementById('sign-role').value;
+        const password = document.getElementById('sign-pass').value;
+        const confirmPassword = document.getElementById('sign-pass-confirm').value;
 
-        if(res.ok) {
-            showAlert(result.message || "Demande envoyée avec succès", true);
-            document.getElementById('signup-form').reset();
-            setTimeout(() => toggleForm('login'), 3000);
-        } else {
-            // 👇 هوني الحل: كان الغلطة 422، نكتبوها بطريقة تفهمها الـ interface
-            if (res.status === 422 && Array.isArray(result.detail)) {
-                // نخرجوا الـ msg متاع أول غلطة تقابلنا
-                showAlert(result.detail[0].msg, false);
-            } else {
-                showAlert(result.detail || result.message || "Erreur d'inscription", false);
-            }
+        // 🚨 لم الداتا الجديدة
+        const username = document.getElementById('sign-username').value;
+        const department = document.getElementById('sign-department').value;
+        const sub_department = document.getElementById('sign-subdepartment').value;
+
+        if (password !== confirmPassword) {
+            showAlert("Les mots de passe ne correspondent pas!", false);
+            return;
         }
-    } catch (err) {
-        showAlert("Erreur de connexion au serveur", false);
-    }
-});
+
+        try {
+            const res = await fetch('/api/signup', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' },
+                // 🚨 بعثان الداتا الكل للباكاند
+                body: JSON.stringify({ 
+                    email: email, 
+                    password: password, 
+                    role: role,
+                    username: username,
+                    department: department,
+                    sub_department: sub_department
+                })
+            });
+            
+            const result = await res.json();
+
+            if(res.ok) {
+                showAlert(result.message || "Demande envoyée avec succès", true);
+                document.getElementById('signup-form').reset();
+                setTimeout(() => toggleForm('login'), 3000);
+            } else {
+                if (res.status === 422 && Array.isArray(result.detail)) {
+                    showAlert(result.detail[0].msg, false);
+                } else {
+                    showAlert(result.detail || result.message || "Erreur d'inscription", false);
+                }
+            }
+        } catch (err) {
+            showAlert("Erreur de connexion au serveur", false);
+        }
+    });
 
     // ==========================================
     // 2. Submission متاع الـ Login
@@ -166,6 +307,11 @@
             if(res.ok) {
                 localStorage.setItem("userRole", result.role);
                 localStorage.setItem("userEmail", emailVal);
+                // 🚨 زدنا السطور هاذم باش نهزو الداتا للـ Dashboard
+                localStorage.setItem("userName", result.username);
+                localStorage.setItem("userDept", result.department);
+                localStorage.setItem("userSubDept", result.sub_department);
+                
                 window.location.href = "/dashboard";
             } else {
                 // صلحنا مشكلة الـ undefined
@@ -176,6 +322,7 @@
         }
     });
 </script>
+
 
 </body>
 </html>
