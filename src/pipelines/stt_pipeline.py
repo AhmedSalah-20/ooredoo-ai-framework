@@ -81,41 +81,50 @@ class STTPipeline(BasePipeline):
             return {"train": train, "val": val, "test": dataset["test"]}
 
     def silver(self, dataset):
-        print("🧼 Silver layer - cleaning...")
+        print("🧼 Silver layer - cleaning text & filtering duration...")
 
         cfg = self.config["dataset"]
         text_col = cfg["text_column"]
+        audio_col = cfg.get("audio_column", "audio")
+        
         remove_punct = cfg.get("remove_punctuation", True)
         lower_case = cfg.get("lowercase", True)
-        # 1. Fonction ll Filtrage en BATCH
-        def _filter_batch(batch):
-            # Trajaa True ken text fih ktiba, False ken vide
-            return [
-                bool(text and len(str(text).strip()) > 0) 
-                for text in batch[text_col]
-            ]
         
-        # 2. Fonction ll Nettoyage en BATCH
+        # 1. نجبدو الـ Min والـ Max من الـ Config اللي بعثها الـ UI
+        min_dur = float(cfg.get("min_duration", 1.0))
+        max_dur = float(cfg.get("max_duration", 20.0))
+
+        # 2. تنظيف النص (نخليوها Batched باش تخدم فيسع)
         def _clean_text_batch(batch):
             cleaned = []
             for text in batch[text_col]:
                 val = str(text) if text is not None else ""
                 if remove_punct:
-                    val = re.sub(r'[,\?\.\!\-\;\:\"\%“”]', '', val)
+                    val = re.sub(r'[,\?\.\!\-\;\:\"\%“”،؟؛]', '', val)
                 if lower_case:
                     val = val.lower()
                 cleaned.append(val.strip())
-            
-            # Modifiw ken text column, w nrajjou batch
             batch[text_col] = cleaned
             return batch
-        # 3. L'Execution w l'astuce mtaa batched=True
-        print("⏳ Filtering empty transcripts...")
-        dataset = dataset.filter(_filter_batch, batched=True)
-        
+
         print("⏳ Cleaning text...")
         dataset = dataset.map(_clean_text_batch, batched=True)
-        
+
+        # 3. فيلتر يثبت في النص والوقت مع بعضهم
+        def _filter_valid(ex):
+            # الشرط الأول: النص ميكونش فارغ
+            text_valid = bool(ex[text_col] and len(str(ex[text_col]).strip()) > 0)
+            
+            # الشرط الثاني: طول الصوت بالثواني
+            audio = ex[audio_col]
+            duration = len(audio["array"]) / audio["sampling_rate"]
+            dur_valid = (min_dur <= duration <= max_dur)
+            
+            return text_valid and dur_valid
+
+        print(f"⏳ Filtering: Duration [{min_dur}s - {max_dur}s] and Empty Text...")
+        dataset = dataset.filter(_filter_valid)
+
         return dataset
 
 
@@ -126,21 +135,19 @@ class STTPipeline(BasePipeline):
         audio_col = cfg.get("audio_column", "audio")
         text_col = cfg.get("text_column", "transcript")
         
-        # 1. Audio Resampling to 16kHz (ضروري لـ Whisper)
-        # الكود هذا يضمن إنو أي صوت يجي، يترد 16000 Hz مهما كان الـ source
+        # 1. Resampling 16kHz
         dataset = dataset.cast_column(audio_col, Audio(sampling_rate=16000))
         
-        # 2. Preparation function
         def _prepare_dataset(batch):
             audio = batch[audio_col]
             
-            # Extract input features from audio
+            # Extract features
             batch["input_features"] = self.processor.feature_extractor(
                 audio["array"], 
                 sampling_rate=audio["sampling_rate"]
             ).input_features[0]
             
-            # Tokenize targets (text)
+            # Tokenize labels
             batch["labels"] = self.processor.tokenizer(
                 batch[text_col],
                 truncation=True,
@@ -149,20 +156,8 @@ class STTPipeline(BasePipeline):
             
             return batch
 
-        # 3. Apply transformation
-        # نخدمو بالـ map باش نحضرو الـ features و الـ labels لكل الـ dataset
+        # 2. Apply Mapping w نغطسو الـ Tensors (ونحينا الفيلتر الغالط)
         dataset = dataset.map(_prepare_dataset, remove_columns=dataset.column_names)
         
-        # 4. Final Duration Filter (للحماية من الـ OOM Errors)
-        # Whisper ما يحبش فوق الـ 30 ثانية
-        def _filter_duration(batch):
-            # الـ input_features طولها يمثل مدة الصوت
-            # نحسبو المدة: len(features) * hop_length / sampling_rate
-            audio_length = len(batch["input_features"][0]) * 320 / 16000 
-            return audio_length < 30.0
-            
-        dataset = dataset.filter(_filter_duration)
-        
         print(f"✅ Gold layer ready! Dataset size: {len(dataset)}")
-        return dataset 
-
+        return dataset

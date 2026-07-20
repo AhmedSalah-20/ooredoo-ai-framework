@@ -216,8 +216,8 @@ async function runPipeline(event) {
         audio_column: document.getElementById('config-audio-col').value,
         text_column: document.getElementById('config-text-col').value,
         val_size: parseInt(document.getElementById('config-val-size').value) || 300,
-        min_duration: parseFloat(document.getElementById('config-min-dur').value) || 1.0,
-        max_duration: parseFloat(document.getElementById('config-max-dur').value) || 20.0,
+        min_duration: parseFloat(document.getElementById('config-min-dur').value.replace(',', '.')) || 1.0,
+        max_duration: parseFloat(document.getElementById('config-max-dur').value.replace(',', '.')) || 20.0,
         max_label_length: parseInt(document.getElementById('config-max-label').value) || 448,
         lowercase: document.getElementById('config-lowercase').checked,
         remove_punctuation: document.getElementById('config-remove-punct').checked
