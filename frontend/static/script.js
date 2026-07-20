@@ -211,10 +211,22 @@ async function runPipeline(event) {
         return;
     }
 
+    // --- JDID: Nejbdou les valeurs mtaa l'Advanced Settings ---
+    const advancedConfig = {
+        audio_column: document.getElementById('config-audio-col').value,
+        text_column: document.getElementById('config-text-col').value,
+        val_size: parseInt(document.getElementById('config-val-size').value) || 300,
+        min_duration: parseFloat(document.getElementById('config-min-dur').value) || 1.0,
+        max_duration: parseFloat(document.getElementById('config-max-dur').value) || 20.0,
+        max_label_length: parseInt(document.getElementById('config-max-label').value) || 448,
+        lowercase: document.getElementById('config-lowercase').checked,
+        remove_punctuation: document.getElementById('config-remove-punct').checked
+    };
+
     statusText.innerHTML = "⏳ Processing... Please wait.";
     statusText.style.color = "#3b82f6";
     
-    // 2. Nbadlou l'URL mtaa l'API selon l'Pipeline choisi
+    // 2. Nbadlou l'URL 
     let apiUrl = "";
     if (pipelineType === "llm") {
         apiUrl = "/api/pipeline/llm/process";
@@ -231,7 +243,8 @@ async function runPipeline(event) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ 
                 source: datasetSource,
-                dataset_path: datasetPath 
+                dataset_path: datasetPath,
+                advanced_config: advancedConfig // <-- Zidna hethi
             })
         });
 
@@ -651,4 +664,23 @@ async function deleteUserRecord(email) {
         }
     }
 }
+
+// ==========================================
+// TOGGLE ADVANCED SETTINGS PANEL
+// ==========================================
+function toggleAdvancedSettings() {
+    const panel = document.getElementById('advanced-settings-panel');
+    const icon = document.getElementById('adv-icon');
+    
+    if (panel.style.display === 'none') {
+        panel.style.display = 'block';
+        icon.classList.remove('fa-chevron-down');
+        icon.classList.add('fa-chevron-up');
+    } else {
+        panel.style.display = 'none';
+        icon.classList.remove('fa-chevron-up');
+        icon.classList.add('fa-chevron-down');
+    }
+}
+
 

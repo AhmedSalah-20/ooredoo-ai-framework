@@ -120,9 +120,49 @@ class STTPipeline(BasePipeline):
 
 
     def gold(self, dataset):
+        print("🏆 Gold layer - Preparing features and labels...")
+        
+        cfg = self.config["dataset"]
+        audio_col = cfg.get("audio_column", "audio")
+        text_col = cfg.get("text_column", "transcript")
+        
+        # 1. Audio Resampling to 16kHz (ضروري لـ Whisper)
+        # الكود هذا يضمن إنو أي صوت يجي، يترد 16000 Hz مهما كان الـ source
+        dataset = dataset.cast_column(audio_col, Audio(sampling_rate=16000))
+        
+        # 2. Preparation function
+        def _prepare_dataset(batch):
+            audio = batch[audio_col]
+            
+            # Extract input features from audio
+            batch["input_features"] = self.processor.feature_extractor(
+                audio["array"], 
+                sampling_rate=audio["sampling_rate"]
+            ).input_features[0]
+            
+            # Tokenize targets (text)
+            batch["labels"] = self.processor.tokenizer(
+                batch[text_col],
+                truncation=True,
+                max_length=self.config["model"].get("max_label_length", 448)
+            ).input_ids
+            
+            return batch
 
-
-        print("🏆 Gold layer - feature extraction (simple)...")
-        # Simple version - skip heavy processing for now
-        return dataset  # TODO: add processor later when stable
+        # 3. Apply transformation
+        # نخدمو بالـ map باش نحضرو الـ features و الـ labels لكل الـ dataset
+        dataset = dataset.map(_prepare_dataset, remove_columns=dataset.column_names)
+        
+        # 4. Final Duration Filter (للحماية من الـ OOM Errors)
+        # Whisper ما يحبش فوق الـ 30 ثانية
+        def _filter_duration(batch):
+            # الـ input_features طولها يمثل مدة الصوت
+            # نحسبو المدة: len(features) * hop_length / sampling_rate
+            audio_length = len(batch["input_features"][0]) * 320 / 16000 
+            return audio_length < 30.0
+            
+        dataset = dataset.filter(_filter_duration)
+        
+        print(f"✅ Gold layer ready! Dataset size: {len(dataset)}")
+        return dataset 
 

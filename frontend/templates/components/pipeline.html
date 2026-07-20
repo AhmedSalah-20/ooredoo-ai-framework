@@ -27,6 +27,74 @@
             <i class="fas fa-bolt"></i> Ingest & Process
         </button>
     </div>
+    <!-- ⚙️ ADVANCED SETTINGS SECTION -->
+<div style="margin-bottom: 25px;">
+    <!-- Toggle Button -->
+    <button type="button" onclick="toggleAdvancedSettings()" style="background: none; border: none; color: #64748b; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 0; font-size: 14px;">
+        <i class="fas fa-sliders-h"></i> <span>Advanced Configuration</span> <i id="adv-icon" class="fas fa-chevron-down" style="font-size: 12px;"></i>
+    </button>
+    
+    <!-- Settings Panel (Hidden by default) -->
+    <div id="advanced-settings-panel" style="display: none; margin-top: 15px; padding: 20px; background: #f8fafc; border-radius: 8px; border: 1px solid #cbd5e1; box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.02);">
+        
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+            <!-- Column Mapping -->
+            <div>
+                <h4 style="margin-top: 0; color: #1e293b; font-size: 13px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 12px;"><i class="fas fa-table" style="color: #3b82f6;"></i> Column Mapping</h4>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div>
+                        <label style="font-size: 12px; font-weight: 600; color: #64748b; display: block; margin-bottom: 4px;">Audio Column</label>
+                        <input type="text" id="config-audio-col" value="audio" style="padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; width: 100%; font-size: 13px;">
+                    </div>
+                    <div>
+                        <label style="font-size: 12px; font-weight: 600; color: #64748b; display: block; margin-bottom: 4px;">Text Column</label>
+                        <input type="text" id="config-text-col" value="transcript" style="padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; width: 100%; font-size: 13px;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Filtering -->
+            <div>
+                <h4 style="margin-top: 0; color: #1e293b; font-size: 13px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 12px;"><i class="fas fa-filter" style="color: #10b981;"></i> Data Filtering</h4>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div>
+                        <label style="font-size: 12px; font-weight: 600; color: #64748b; display: block; margin-bottom: 4px;">Validation Size</label>
+                        <input type="number" id="config-val-size" value="300" style="padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; width: 100%; font-size: 13px;">
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <div style="flex: 1;">
+                            <label style="font-size: 12px; font-weight: 600; color: #64748b; display: block; margin-bottom: 4px;">Min Dur. (s)</label>
+                            <input type="number" step="0.5" id="config-min-dur" value="1.0" style="padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; width: 100%; font-size: 13px;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-size: 12px; font-weight: 600; color: #64748b; display: block; margin-bottom: 4px;">Max Dur. (s)</label>
+                            <input type="number" step="0.5" id="config-max-dur" value="20.0" style="padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; width: 100%; font-size: 13px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Text Processing & Cleaning -->
+            <div>
+                <h4 style="margin-top: 0; color: #1e293b; font-size: 13px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 12px;"><i class="fas fa-broom" style="color: #f59e0b;"></i> Text Processing</h4>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div>
+                        <label style="font-size: 12px; font-weight: 600; color: #64748b; display: block; margin-bottom: 4px;">Max Label Length (Tokens)</label>
+                        <input type="number" id="config-max-label" value="448" min="10" max="448" style="padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; width: 100%; font-size: 13px;">
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 5px;">
+                        <label style="font-size: 13px; color: #334155; display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" id="config-lowercase" checked style="width: 16px; height: 16px;"> Lowercase Text
+                        </label>
+                        <label style="font-size: 13px; color: #334155; display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" id="config-remove-punct" checked style="width: 16px; height: 16px;"> Remove Punctuation
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
     <div class="stats-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px;">
         <div class="stat-card" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border-left: 5px solid #64748b;">

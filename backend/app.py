@@ -15,6 +15,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse, JSONResponse
 from pydantic import BaseModel
+from typing import Optional, Dict, Any
 
 # Setup System Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -113,6 +114,7 @@ class SignupModel(BaseModel):
 class PipelineRequest(BaseModel):
     source: str 
     dataset_path: str
+    advanced_config: Optional[Dict[str, Any]] = None
     output_dir: str = None
 
 # 🚨 زيد هذا هنا باش FastAPI يفهم الـ Credentials
@@ -437,8 +439,23 @@ def process_stt_pipeline(request: PipelineRequest):
         current_config = stt_config.copy()
         if "dataset" not in current_config:
             current_config["dataset"] = {}
+
         current_config["dataset"]["source"] = request.source
         current_config["dataset"]["path"] = request.dataset_path
+        # --- JDID: Override بالـ Advanced Config اللي جات مالـ Frontend ---
+        if request.advanced_config:
+            adv = request.advanced_config
+            # نبدلو القيم، وكان فما قيمة ناقصة نخليو الـ Default متاع الـ YAML
+            current_config["dataset"]["audio_column"] = adv.get("audio_column", current_config["dataset"].get("audio_column", "audio"))
+            current_config["dataset"]["text_column"] = adv.get("text_column", current_config["dataset"].get("text_column", "transcript"))
+            current_config["dataset"]["val_size"] = adv.get("val_size", current_config["dataset"].get("val_size", 300))
+            current_config["dataset"]["min_duration"] = adv.get("min_duration", current_config["dataset"].get("min_duration", 1.0))
+            current_config["dataset"]["max_duration"] = adv.get("max_duration", current_config["dataset"].get("max_duration", 20.0))
+            current_config["dataset"]["lowercase"] = adv.get("lowercase", current_config["dataset"].get("lowercase", True))
+            current_config["dataset"]["remove_punctuation"] = adv.get("remove_punctuation", current_config["dataset"].get("remove_punctuation", True))
+            
+            logger.info(f"⚙️ Applied Advanced Config: {adv}")
+        # -------------------------------------------------------------------
 
         pipeline = STTPipeline(current_config)
         raw_dataset = pipeline.load()
@@ -545,9 +562,7 @@ def process_tts_pipeline(request: PipelineRequest):
         return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
     
 
-# ==========================================
-# 10. PLAYGROUND & TRAINING ENDPOINTS (MOCK)
-# ==========================================
+
 @app.get("/api/config/{model_type}")
 async def get_config(model_type: str):
     if model_type == "llm":
@@ -587,10 +602,6 @@ async def start_training(model_type: str):
 async def health():
     return {"status": "healthy"}
 
-
-# ==========================================
-# 11. MAIN ENTRYPOINT
-# ==========================================
 if __name__ == "__main__":
     import uvicorn
     print("\n" + "🚀"*30)
